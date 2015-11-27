@@ -1,0 +1,12 @@
+source 'https://github.com/CocoaPods/Specs.git'
+use_frameworks!
+
+target 'MagneticFields_Example', :exclusive => true do
+  pod "MagneticFields", :path => "../"
+end
+
+target 'MagneticFields_Tests', :exclusive => true do
+  pod "MagneticFields", :path => "../"
+
+  
+end
