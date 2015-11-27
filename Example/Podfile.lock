@@ -1,0 +1,14 @@
+PODS:
+  - MagneticFields (0.1.0)
+
+DEPENDENCIES:
+  - MagneticFields (from `../`)
+
+EXTERNAL SOURCES:
+  MagneticFields:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  MagneticFields: 9f6b6e98cbf34e4f484aac916ca9a0a408945049
+
+COCOAPODS: 0.39.0
