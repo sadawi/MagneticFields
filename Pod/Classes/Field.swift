@@ -83,8 +83,8 @@ public class BaseField<T>: FieldType, FieldObserver {
         }
     }
     
-    public func require(message:String?=nil, rule:(T -> Bool)) -> Self {
-        let validator = Validator<T>(message:message, rule: rule)
+    public func require(message:String?=nil, presence:Bool=false, rule:(T -> Bool)?=nil) -> Self {
+        let validator = Validator<T>(message:message, rule: rule, allowNil: !presence)
         self.validators.append(validator)
         return self
     }
