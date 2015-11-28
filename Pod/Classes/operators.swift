@@ -35,6 +35,7 @@ public func <--><T>(left: Field<T>, right: Field<T>) {
     right.addObserver(left)
     left.addObserver(right)
 }
+
 public func ==<T:Equatable>(left: Field<T>, right: T) -> Bool {
     return left.value == right
 }

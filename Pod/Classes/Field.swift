@@ -91,7 +91,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     func valueChanged() {
         self.changedAt = NSDate()
         for (_, observation) in self.observations {
-            observation.call(self)
+            observation.call(value:self.value, field:self)
         }
     }
     
@@ -100,9 +100,13 @@ public class BaseField<T>: FieldType, FieldObserver {
     private var observations:[Int:Observation<T>] = [:]
 
     public func addObserver(observer:FieldObserver?=nil, action:(T? -> Void)?=nil) -> Observation<T> {
-        let observation = Observation(owner: observer, observer: observer, action: action, date: NSDate())
+        let observation = Observation<T>()
+        observation.owner = observer
+        observation.observer = observer
+        observation.action = action
+        observation.date = NSDate()
         self.observations[observation.key] = observation
-        observation.call(self)
+        observation.call(value:self.value, field:self)
         return observation
     }
     

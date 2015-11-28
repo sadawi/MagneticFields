@@ -8,21 +8,30 @@
 
 import Foundation
 
-public struct Observation<T> {
+public class Observation<T> {
     var owner:AnyObject?
     var observer:FieldObserver?
-    var action:(T? -> Void)?
-    var date:NSDate?
     
-    func call(field:BaseField<T>) {
-        if let action = action {
-            action(field.value)
+    var action:(T? -> Void)?
+    var chainableAction:(T? -> T?)?
+    
+    var date:NSDate?
+    var nextObservation:Observation<T>?
+    
+    func call(value value:T?, field:BaseField<T>?) {
+        if let chainableAction = chainableAction {
+            let result = chainableAction(field?.value)
+            if let nextObservation = nextObservation {
+                nextObservation.call(value: result, field: nil)
+            }
+        } else if let action = action {
+            action(field?.value)
         } else if let observer = self.observer {
-            observer.fieldValueChanged(field.value, field: field)
+            observer.fieldValueChanged(field?.value, field: field)
         }
     }
     
-    static func keyForObserver(observer:FieldObserver?) -> Int {
+    class func keyForObserver(observer:FieldObserver?) -> Int {
         return ObjectIdentifier(observer ?? defaultObserverKey).hashValue
     }
     
