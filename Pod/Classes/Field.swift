@@ -104,7 +104,6 @@ public class BaseField<T>: FieldType, FieldObserver {
         observation.owner = observer
         observation.observer = observer
         observation.action = action
-        observation.date = NSDate()
         self.observations[observation.key] = observation
         observation.call(value:self.value, field:self)
         return observation

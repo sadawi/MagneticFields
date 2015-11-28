@@ -15,7 +15,6 @@ public class Observation<T> {
     var action:(T? -> Void)?
     var chainableAction:(T? -> T?)?
     
-    var date:NSDate?
     var nextObservation:Observation<T>?
     
     func call(value value:T?, field:BaseField<T>?) {
