@@ -69,7 +69,8 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     private var observers:NSMutableSet = NSMutableSet()
     private var onChange:(BaseField<T> -> Void)?
-    
+    public var changedAt:NSDate?
+        
     public init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
         self.value = value
         self.name = name
@@ -95,6 +96,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     }
     
     func valueChanged() {
+        self.changedAt = NSDate()
         for observer in self.observers {
             if let observer = observer as? FieldObserver {
                 observer.fieldValueChanged(self)
@@ -135,12 +137,9 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         super.init(value: value, name: name, allowedValues: allowedValues)
     }
     
-    public var changedAt:NSDate?
-
     private override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
         super.valueUpdated(oldValue: oldValue, newValue: newValue)
         if oldValue != self.value {
-            self.changedAt = NSDate()
             self.valueChanged()
         }
     }
