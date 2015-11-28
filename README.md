@@ -68,9 +68,19 @@ field --> observer { value in
 }
 ```
 
-`Field` itself implements `FieldObserver`, and the `-->` operator can also be used to create a link between two fields.  `sourceField --> destinationField` will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
+`Field` itself implements `FieldObserver`, and the `-->` operator can also be used to create a link between two fields.
 
-The relation can be made bidirectional using the `<-->` operator.  In that case, both fields will initially have the value of the field on the right-hand side, and subsequent changes to either will be propagated to the other.
+```swift
+sourceField --> destinationField
+```
+will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
+
+The relation can be made bidirectional using the `<-->` operator:
+
+```swift
+sourceField <--> destinationField
+```
+Here, both fields will initially have the value of `destinationField`, and subsequent changes to either will be propagated to the other.
 
 A field can have a single onChange closure.
 
