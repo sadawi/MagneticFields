@@ -9,8 +9,8 @@
 import Foundation
 
 public class Observation<T> {
-    public typealias ObservationAction = (T? -> Void)
-    public typealias ChainableObservationAction = (T? -> T?)
+    typealias ObservationAction = (T? -> Void)
+    typealias ChainableObservationAction = (T? -> T?)
     
     var observer:FieldObserver?
     
