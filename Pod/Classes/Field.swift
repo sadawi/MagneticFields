@@ -38,7 +38,19 @@ public protocol FieldObserver:AnyObject {
 let defaultObserverKey:NSString = "____"
 
 public class BaseField<T>: FieldType, FieldObserver {
+    /**
+        Information about whether this field's value has been set
+    */
+    public var state:LoadState = .NotSet
     
+    /**
+        A human-readable name for this field.
+    */
+    public var name:String?
+    
+    /**
+        The value contained in this field.  Note: it's always Optional.
+    */
     public var value:T? {
         didSet {
             self.valueUpdated(oldValue: oldValue, newValue: self.value)
@@ -51,34 +63,41 @@ public class BaseField<T>: FieldType, FieldObserver {
         self.updatedAt = NSDate()
     }
     
-    public var state:LoadState = .NotSet
-    public var error:ErrorType?
-    public var name:String?
     
     public var changedAt:NSDate?
     public var updatedAt:NSDate?
 
     
+    /**
+        Initialize a new field.
+        
+        - parameter value: The field's initial value
+        - parameter name: A human-readable name for this field
+    */
+    public init(value:T?=nil, name:String?=nil) {
+        self.value = value
+        self.name = name
+    }
+    
+    // MARK: - Validation
+
+    private var validators:[Validator<T>] = []
+    private var validationState:ValidationState = .Unknown
+
+    /**
+        Test whether the current field value passes all the validation rules.
+    */
     public var valid:Bool {
         get {
             return self.validate() == .Valid
         }
     }
-    
-    public init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
-        self.value = value
-        self.name = name
-        if let allowedValues = allowedValues {
-            self.allowedValues = allowedValues
-        }
-    }
-    
-    // MARK: - Validation
 
-    public var allowedValues:[T] = []
-    public var validators:[Validator<T>] = []
-    private var validationState:ValidationState = .Unknown
-
+    /**
+        Test whether the current field value passes all the validation rules.
+    
+        - returns: A ValidationState that includes error messages, if applicable.
+    */
     public func validate() -> ValidationState {
         if self.validationState == .Unknown {
             var valid = true
@@ -94,13 +113,20 @@ public class BaseField<T>: FieldType, FieldObserver {
         return self.validationState
     }
     
-    public func require(message message:String?=nil, presence:Bool=false, rule:(T -> Bool)?=nil) -> Self {
-        let validator = Validator<T>(message:message, rule: rule, allowNil: !presence)
+    /**
+        Adds a validation rule to the field.
+    
+        - parameter message: A message explaining why validation failed, in the form of a partial sentence (e.g., "must be zonzero")
+        - parameter allowNil: Whether nil values should be considered valid
+        - parameter rule: A closure containing validation logic for an unwrapped field value
+    */
+    public func require(message message:String?=nil, allowNil:Bool=true, rule:(T -> Bool)?=nil) -> Self {
+        let validator = Validator<T>(message:message, rule: rule, allowNil: allowNil)
         self.validators.append(validator)
         return self
     }
     
-    func valueChanged() {
+    private func valueChanged() {
         self.changedAt = NSDate()
         for (_, observation) in self.observations {
             observation.call(value:self.value, field:self)
@@ -111,6 +137,13 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     private var observations:[Int:Observation<T>] = [:]
 
+    /**
+        Registers a value change observer, which can either be a FieldObserver object or a closure.
+        Registering an observerless closure will replace any previous closure.
+    
+        - parameter observer: a FieldObserver object that will receive change notifications
+        - parameter action: a closure to handle changes
+    */
     public func addObserver(observer:FieldObserver?=nil, action:(T? -> Void)?=nil) -> Observation<T> {
         let observation = Observation<T>(observer:observer, action:action)
         self.observations[observation.key] = observation
@@ -118,10 +151,16 @@ public class BaseField<T>: FieldType, FieldObserver {
         return observation
     }
     
+    /**
+        Unregisters an observer
+    */
     public func removeObserver(observer:FieldObserver) {
         self.observations[Observation<T>.keyForObserver(observer)] = nil
     }
     
+    /**
+        Unregisters all observers and closures.
+    */
     public func removeAllObservers() {
         self.observations = [:]
     }
@@ -137,8 +176,8 @@ public class BaseField<T>: FieldType, FieldObserver {
 }
 
 public class Field<T:Equatable>: BaseField<T>, Equatable {
-    public override init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
-        super.init(value: value, name: name, allowedValues: allowedValues)
+    public override init(value:T?=nil, name:String?=nil) {
+        super.init(value: value, name: name)
     }
     
     private override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
@@ -171,7 +210,7 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         }
     }
     
-    public init(value:[T]?=nil, name:String?=nil) {
+    public override init(value:[T]?=nil, name:String?=nil) {
         super.init(name: name)
         self.value = value
     }
