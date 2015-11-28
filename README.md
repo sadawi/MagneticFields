@@ -11,6 +11,7 @@ MagneticFields is a library for adding fields to your model objects.  It'll give
 * type-safe change observation
 * automatic timestamps
 * validations
+* load state
 
 ## Installation
 
@@ -102,6 +103,23 @@ purchase.dollars --> { $0 * 100 } --> purchase.cents --> { print("I spent \($0) 
 ```
 
 Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()` or by `field --> nil`
+
+## Load State
+
+It can be useful to distinguish between a value that's nil because hasn't been loaded yet (e.g., from an API), and one that is known to be nil.  For this, fields provide the `state` property, whose values are in the `LoadState` enum:
+
+```swift
+public enum LoadState {
+    case NotLoaded
+    case Loading
+    case Loaded
+    case Error
+}
+```
+
+All fields are initially in the `.NotLoaded` state, but automatically become `.Loaded` when their value is set to anything.
+
+The `.Loading` state can be useful when the process of loading takes time.  You might decide to show a spinner in the UI while making an API request, for example.
 
 ## License
 
