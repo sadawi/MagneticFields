@@ -24,7 +24,7 @@ public enum ValidationState {
 public protocol FieldType:AnyObject { }
 
 public protocol FieldObserver:AnyObject {
-    func fieldValueChanged(field:FieldType)
+    func fieldValueChanged(value:Any?, field:FieldType?)
 }
 
 let defaultObserverKey:NSString = "____"
@@ -113,7 +113,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     // MARK: - FieldObserver protocol methods
     
-    public func fieldValueChanged(field:FieldType) {
+    public func fieldValueChanged(value:Any?, field:FieldType?) {
         if let observedField = field as? BaseField<T> {
             self.value = observedField.value
         }

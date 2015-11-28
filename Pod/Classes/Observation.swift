@@ -18,7 +18,7 @@ public struct Observation<T> {
         if let action = action {
             action(field)
         } else if let observer = self.observer {
-            observer.fieldValueChanged(field)
+            observer.fieldValueChanged(field.value, field: field)
         }
     }
     

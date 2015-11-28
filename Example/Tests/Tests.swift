@@ -18,9 +18,9 @@ class Entity {
 class View:FieldObserver {
     var value:String?
     
-    func fieldValueChanged(field: FieldType) {
-        if let field = field as? Field<String> {
-            self.value = field.value
+    func fieldValueChanged(value:Any?, field: FieldType?) {
+        if let value = value as? String {
+            self.value = value
         }
     }
 }
