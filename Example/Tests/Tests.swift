@@ -109,20 +109,20 @@ class FieldTests: XCTestCase {
         
     }
     
-    class TestModel: FieldModel {
-        let name = Field<String>()
-        let age = Field<Int>()
-    }
-    
-    func testFieldModel() {
-        let model = TestModel()
-        model.name.value = "John"
-        
-        let fields = model.fields()
-        print(fields)
-        
-//        let dictionaryValue = model.dictionaryValue
-//        XCTAssertEqual(dictionaryValue["name"] as? String, "John")
-    }
+//    class TestModel: FieldModel {
+//        let name = Field<String>()
+//        let age = Field<Int>()
+//    }
+//    
+//    func testFieldModel() {
+//        let model = TestModel()
+//        model.name.value = "John"
+//        
+//        let fields = model.fields()
+//        print(fields)
+//        
+////        let dictionaryValue = model.dictionaryValue
+////        XCTAssertEqual(dictionaryValue["name"] as? String, "John")
+//    }
     
 }
