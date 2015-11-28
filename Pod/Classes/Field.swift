@@ -8,11 +8,17 @@
 
 import Foundation
 
-public enum FieldState {
+public enum LoadState {
     case NotLoaded
     case Loading
     case Loaded
     case Error
+}
+
+public enum ValidationState {
+    case Unknown
+    case Invalid
+    case Valid
 }
 
 public protocol FieldType:AnyObject { }
@@ -25,13 +31,26 @@ public class BaseField<T>: FieldType, FieldObserver {
     public var value:T? {
         didSet {
             self.state = .Loaded
+            self.validationState = .Unknown
         }
     }
     
-    public var state:FieldState = .NotLoaded
+    public var state:LoadState = .NotLoaded
     public var error:ErrorType?
     public var name:String?
     public var allowedValues:[T] = []
+    public var validators:[Validator<T>] = []
+
+    private var validationState:ValidationState = .Unknown
+    
+    public var valid:Bool {
+        get {
+            if self.validationState == .Unknown {
+                self.validate()
+            }
+            return self.validationState == .Valid
+        }
+    }
     
     private weak var observedField:BaseField<T>? {
         didSet {
@@ -52,6 +71,22 @@ public class BaseField<T>: FieldType, FieldObserver {
         if let allowedValues = allowedValues {
             self.allowedValues = allowedValues
         }
+    }
+    
+    private func validate() {
+        if self.validationState == .Unknown {
+            var valid = true
+            for validator in self.validators {
+                valid = valid && validator.validate(self.value)
+            }
+            self.validationState = valid ? .Valid : .Invalid
+        }
+    }
+    
+    public func require(message:String?=nil, rule:(T -> Bool)) -> Self {
+        let validator = Validator<T>(message:message, rule: rule)
+        self.validators.append(validator)
+        return self
     }
     
     func valueChanged() {
