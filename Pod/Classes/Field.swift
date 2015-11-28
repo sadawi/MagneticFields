@@ -15,30 +15,25 @@ public enum FieldState {
     case Error
 }
 
-public protocol FieldType {
-    
-}
+public protocol FieldType:AnyObject { }
 
 public protocol FieldObserver:AnyObject {
     func fieldValueChanged(field:FieldType)
 }
 
-public class Field<T:Equatable>: FieldType, FieldObserver, Equatable {
-    
+public class BaseField<T>: FieldType, FieldObserver {
     public var value:T? {
         didSet {
             self.state = .Loaded
-            if oldValue != self.value {
-                self.valueChanged()
-            }
         }
     }
+    
     public var state:FieldState = .NotLoaded
     public var error:ErrorType?
     public var name:String?
     public var allowedValues:[T] = []
     
-    private weak var observedField:Field<T>? {
+    private weak var observedField:BaseField<T>? {
         didSet {
             if self.observedField == nil {
                 if let oldField = oldValue {
@@ -49,7 +44,7 @@ public class Field<T:Equatable>: FieldType, FieldObserver, Equatable {
     }
     
     private var observers:NSMutableSet = NSMutableSet()
-    private var onChange:(Field<T> -> Void)?
+    private var onChange:(BaseField<T> -> Void)?
     
     public init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
         self.value = value
@@ -72,66 +67,68 @@ public class Field<T:Equatable>: FieldType, FieldObserver, Equatable {
     
     public func addObserver(observer:FieldObserver) {
         self.observers.addObject(observer)
-        if let observerField = observer as? Field<T> {
+        if let observerField = observer as? BaseField<T> {
             observerField.observedField = self
         }
     }
     
-    public func observe(action:(Field<T> -> Void)) {
+    public func observe(action:(BaseField<T> -> Void)) {
         self.onChange = action
     }
     
     public func removeObserver(observer:FieldObserver) {
         self.observers.removeObject(observer)
-        if let observerField = observer as? Field<T> {
+        if let observerField = observer as? BaseField<T> {
             observerField.observedField = nil
         }
     }
     
     public func fieldValueChanged(field:FieldType) {
-        if let observedField = field as? Field<T> {
+        if let observedField = field as? BaseField<T> {
             self.value = observedField.value
         }
     }
 }
 
+public class Field<T:Equatable>: BaseField<T>, Equatable {
+    public override init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
+        super.init(value: value, name: name, allowedValues: allowedValues)
+    }
 
-infix operator <-- { associativity left precedence 95 }
-infix operator --> { associativity left precedence 95 }
-infix operator <--> { associativity left precedence 95 }
-
-public func <--<T>(observedField:Field<T>, value:T?) {
-    observedField.value = value
-    observedField.observedField = nil
+    public override var value:T? {
+        didSet {
+            self.state = .Loaded
+            if oldValue != self.value {
+                self.valueChanged()
+            }
+        }
+    }
 }
-
-public func <--<T>(observingField:Field<T>, observedField:Field<T>) {
-    observedField.addObserver(observingField)
-    observingField.value = observedField.value
-}
-
-public func --><T>(observedField:Field<T>, observingField:Field<T>) {
-    observingField <-- observedField
-}
-
-public func --><T>(observedField:Field<T>, onChange:(Field<T> -> Void)) {
-    observedField.observe(onChange)
-}
-
-public func <--><T>(left: Field<T>, right: Field<T>) {
-    left.addObserver(right)
-    left.value = right.value
-    right.addObserver(left)
-}
-
-public func ==<T>(left: Field<T>, right: Field<T>) -> Bool {
+public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {
     return left.value == right.value
 }
 
-public func ==<T>(left: Field<T>, right: T) -> Bool {
-    return left.value == right
-}
+public class ArrayField<T:Equatable>: BaseField<[T]> {
+    public override var value:[T]? {
+        didSet {
+            self.state = .Loaded
+            var changed = false
+            if oldValue != nil && self.value != nil {
+                changed = oldValue! != self.value!
+            } else if oldValue == nil && self.value == nil {
+                changed = false
+            } else {
+                changed = true
+            }
+            if changed {
+                self.valueChanged()
+            }
+        }
+    }
+    
+    public init(value:[T]?=nil, name:String?=nil) {
+        super.init(name: name)
+        self.value = value
+    }
 
-public func ==<T>(left: T, right: Field<T>) -> Bool {
-    return left == right.value
 }

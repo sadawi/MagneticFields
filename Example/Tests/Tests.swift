@@ -44,7 +44,7 @@ class FieldTests: XCTestCase {
     
     func testOperators() {
         let entity = Entity()
-        entity.name <-- "Bob"
+        entity.name.value = "Bob"
         XCTAssertEqual(entity.name.value, "Bob")
         XCTAssertTrue(entity.name == "Bob")
         XCTAssertFalse(entity.name == "Bobb")
@@ -55,12 +55,12 @@ class FieldTests: XCTestCase {
         let view = View()
         let entity = Entity()
         entity.name.addObserver(view)
-        entity.name <-- "Alice"
+        entity.name.value = "Alice"
         XCTAssertEqual(view.value, "Alice")
         
         var value:String = "test"
         entity.name --> { value = $0.value! }
-        entity.name <-- "NEW VALUE"
+        entity.name.value = "NEW VALUE"
         XCTAssertEqual(value, "NEW VALUE")
     }
     
@@ -68,11 +68,11 @@ class FieldTests: XCTestCase {
         let a = Entity()
         let b = Entity()
         
-        a.name <-- "John"
-        b.name <-- "John"
+        a.name.value = "John"
+        b.name.value = "John"
         XCTAssertTrue(a.name == b.name)
         
-        b.name <-- "Bob"
+        b.name.value = "Bob"
         
         XCTAssertFalse(a.name == b.name)
         
@@ -83,33 +83,46 @@ class FieldTests: XCTestCase {
         XCTAssertEqual(a.name.value, "Bob")
         XCTAssertEqual(b.name.value, "Bob")
         
-        a.name <-- "Martha"
+        a.name.value = "Martha"
         
         XCTAssertEqual(a.name.value, b.name.value)
         
         let c = Entity()
         let d = Entity()
-        c.name <-- "Alice"
-        d.name <-- "Joan"
+        c.name.value = "Alice"
+        d.name.value = "Joan"
         
         XCTAssertNotEqual(c.name.value, d.name.value)
         
         c.name <-- d.name
         XCTAssertEqual(c.name.value, d.name.value)
         
-        c.name <-- "Kevin"
+        c.name.value = "Kevin"
         XCTAssertNotEqual(c.name.value, d.name.value)
         
-        // Setting c.name to a constant removes the observation
-        d.name <-- "Rebecca"
+        d.name.value = "Rebecca"
         XCTAssertEqual(d.name.value, "Rebecca")
-        XCTAssertNotEqual(c.name.value, d.name.value)
         
         c.name <-- d.name
-        d.name <-- "Rebecca"
+        d.name.value = "Rebecca"
         XCTAssertEqual(c.name.value, d.name.value)
         
     }
     
+    class TestModel: FieldModel {
+        let name = Field<String>()
+        let age = Field<Int>()
+    }
+    
+    func testFieldModel() {
+        let model = TestModel()
+        model.name.value = "John"
+        
+        let fields = model.fields()
+        print(fields)
+        
+//        let dictionaryValue = model.dictionaryValue
+//        XCTAssertEqual(dictionaryValue["name"] as? String, "John")
+    }
     
 }
