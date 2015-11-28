@@ -84,9 +84,9 @@ This will set the value of `destinationField` to that of `sourceField` immediate
 The relation can be made bidirectional using the `<-->` operator:
 
 ```swift
-sourceField <--> destinationField
+field1 <--> field2
 ```
-Here, both fields will initially have the value of `destinationField`, and subsequent changes to either will be propagated to the other.
+Here, both fields will initially have the value of `field2`, and subsequent changes to either will be propagated to the other.
 
 We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
 
