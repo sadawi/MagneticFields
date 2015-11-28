@@ -56,6 +56,13 @@ field.addObserver(observer)
 field.removeObserver(observer)
 ```
 
+Or, observers can conform to `Hashable` and a closure can be provided:
+```swift
+field.addObserver(observer) { value in
+  print(value)
+}
+```
+
 A field can have a single onChange closure.
 
 ```swift
