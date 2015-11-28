@@ -163,14 +163,22 @@ class FieldTests: XCTestCase {
 //    func testChaining() {
 //        let a = Entity()
 //        let b = Entity()
+//        let c = Entity()
 //        
-//        a.name.value = "Alice"
-//        b.name.value = "Betty"
+//        var output:String = "testing"
+//
+//        a.name --> b.name --> { output = $0 }
+//        a.name.value = "hello"
+//        XCTAssertEqual(b.name.value, "hello")
+//        XCTAssertEqual(output, "hello")
 //        
+//        a.name --> b.name --> c.name
+//        XCTAssertEqual(c.name.value, "hello")
+//        
+//        a.name.value = "alice"
 //        a.name --> { $0.value?.uppercaseString } --> b.name
-//        
 //        XCTAssertEqual(b.name.value, "ALICE")
-//        
+//
 //        a.name.value = "Arnold"
 //        XCTAssertEqual(b.name.value, "ARNOLD")
 //    }
