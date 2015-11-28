@@ -110,6 +110,10 @@ public class BaseField<T>: FieldType, FieldObserver {
         self.observations[Observation<T>.keyForObserver(observer)] = nil
     }
     
+    public func removeAllObservers() {
+        self.observations = [:]
+    }
+    
     
     // MARK: - FieldObserver protocol methods
     
