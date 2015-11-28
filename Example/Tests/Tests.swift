@@ -74,7 +74,7 @@ class FieldTests: XCTestCase {
         XCTAssertEqual(view.value, "VALUE 2")
         
         // ...until the observers are explicitly unregistered
-        entity.name.removeObserver(view)
+        entity.name -/-> view
         entity.name.value = "VALUE 3"
         XCTAssertEqual(view.value, "VALUE 2")
     }

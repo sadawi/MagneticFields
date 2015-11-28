@@ -11,6 +11,7 @@ import Foundation
 
 infix operator <-- { associativity left precedence 95 }
 infix operator --> { associativity left precedence 95 }
+infix operator -/-> { associativity left precedence 95 }
 infix operator <--> { associativity left precedence 95 }
 
 public func <--<T>(observer:FieldObserver, observedField:Field<T>) {
@@ -23,6 +24,10 @@ public func --><T>(observedField:Field<T>, observer:FieldObserver) {
 
 public func --><T>(observedField:Field<T>, onChange:(BaseField<T> -> Void)) {
     observedField.addObserver(action: onChange)
+}
+
+public func -/-><T>(observedField:Field<T>, observer:FieldObserver) {
+    observedField.removeObserver(observer)
 }
 
 public func <--><T>(left: Field<T>, right: Field<T>) {
