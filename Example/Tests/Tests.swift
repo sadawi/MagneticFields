@@ -54,7 +54,7 @@ class FieldTests: XCTestCase {
     func testObservation() {
         let view = View()
         let entity = Entity()
-        entity.name.addObserver(view)
+        entity.name --> view
         entity.name.value = "Alice"
         XCTAssertEqual(view.value, "Alice")
         
@@ -62,6 +62,21 @@ class FieldTests: XCTestCase {
         entity.name --> { value = $0.value! }
         entity.name.value = "NEW VALUE"
         XCTAssertEqual(value, "NEW VALUE")
+        
+        // Setting a new pure closure observer will remove the old one
+        var value2:String = "another value"
+        entity.name --> { value2 = $0.value! }
+        entity.name.value = "VALUE 2"
+        XCTAssertEqual(value2, "VALUE 2")
+        XCTAssertEqual(value, "NEW VALUE")
+        
+        // But the registered observers are still active
+        XCTAssertEqual(view.value, "VALUE 2")
+        
+        // ...until the observers are explicitly unregistered
+        entity.name.removeObserver(view)
+        entity.name.value = "VALUE 3"
+        XCTAssertEqual(view.value, "VALUE 2")
     }
     
     func testBinding() {

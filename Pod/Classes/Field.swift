@@ -27,7 +27,10 @@ public protocol FieldObserver:AnyObject {
     func fieldValueChanged(field:FieldType)
 }
 
+let defaultObserverKey:NSString = "____"
+
 public class BaseField<T>: FieldType, FieldObserver {
+    
     public var value:T? {
         didSet {
             self.valueUpdated(oldValue: oldValue, newValue: self.value)
@@ -43,12 +46,10 @@ public class BaseField<T>: FieldType, FieldObserver {
     public var state:LoadState = .NotLoaded
     public var error:ErrorType?
     public var name:String?
-    public var allowedValues:[T] = []
-    public var validators:[Validator<T>] = []
     
+    public var changedAt:NSDate?
     public var updatedAt:NSDate?
 
-    private var validationState:ValidationState = .Unknown
     
     public var valid:Bool {
         get {
@@ -56,20 +57,6 @@ public class BaseField<T>: FieldType, FieldObserver {
             return self.validationState == .Valid
         }
     }
-    
-    private weak var observedField:BaseField<T>? {
-        didSet {
-            if self.observedField == nil {
-                if let oldField = oldValue {
-                    oldField.removeObserver(self)
-                }
-            }
-        }
-    }
-    
-    private var observers:NSMutableSet = NSMutableSet()
-    private var onChange:(BaseField<T> -> Void)?
-    public var changedAt:NSDate?
     
     public init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
         self.value = value
@@ -79,6 +66,12 @@ public class BaseField<T>: FieldType, FieldObserver {
         }
     }
     
+    // MARK: - Validation
+
+    public var allowedValues:[T] = []
+    public var validators:[Validator<T>] = []
+    private var validationState:ValidationState = .Unknown
+
     private func validate() {
         if self.validationState == .Unknown {
             var valid = true
@@ -97,33 +90,27 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     func valueChanged() {
         self.changedAt = NSDate()
-        for observer in self.observers {
-            if let observer = observer as? FieldObserver {
-                observer.fieldValueChanged(self)
-            }
-        }
-        if let action = self.onChange {
-            action(self)
+        for (_, observation) in self.observations {
+            observation.call(self)
         }
     }
     
-    public func addObserver(observer:FieldObserver) {
-        self.observers.addObject(observer)
-        if let observerField = observer as? BaseField<T> {
-            observerField.observedField = self
-        }
-    }
+    // MARK: - Observation
     
-    public func observe(action:(BaseField<T> -> Void)) {
-        self.onChange = action
+    private var observations:[Int:Observation<T>] = [:]
+
+    public func addObserver(observer:FieldObserver?=nil, action:(BaseField<T> -> Void)?=nil) {
+        let observation = Observation(owner: observer, observer: observer, action: action, date: NSDate())
+        self.observations[observation.key] = observation
+        observation.call(self)
     }
     
     public func removeObserver(observer:FieldObserver) {
-        self.observers.removeObject(observer)
-        if let observerField = observer as? BaseField<T> {
-            observerField.observedField = nil
-        }
+        self.observations[Observation<T>.keyForObserver(observer)] = nil
     }
+    
+    
+    // MARK: - FieldObserver protocol methods
     
     public func fieldValueChanged(field:FieldType) {
         if let observedField = field as? BaseField<T> {
