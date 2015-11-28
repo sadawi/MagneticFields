@@ -61,6 +61,8 @@ Fields will automatically have the following timestamps:
 
 A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method.  Observation events are triggered once when the observer is added, and after that whenever a field value is set.
 
+#### Adding an observer
+
 An observer can be added if it implements the `FieldObserver` protocol:
 
 ```swift
@@ -73,6 +75,7 @@ field --> observer { value in
   print(value)
 }
 ```
+#### Binding a field to another field
 
 `Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two fields.
 
@@ -81,12 +84,16 @@ sourceField --> destinationField
 ```
 This will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
 
-The relation can be made bidirectional using the `<-->` operator:
+#### Bidirectional binding
+
+An observation can be made bidirectional using the `<-->` operator:
 
 ```swift
 field1 <--> field2
 ```
 Here, both fields will initially have the value of `field2`, and subsequent changes to either will be propagated to the other.
+
+#### Without explicit observers
 
 We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
 
@@ -96,6 +103,8 @@ age --> { value in
 }
 ```
 
+#### Chaining
+
 The `-->` operator can be chained through any combination of closures and fields.
 
 ```swift
@@ -104,7 +113,7 @@ purchase.dollars --> { $0 * 100 } --> purchase.cents --> { print("I spent \($0) 
 
 Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()`.
 
-## Load State
+### Load State
 
 It can be useful to distinguish between a value that's nil because hasn't been loaded yet (e.g., from an API), and one that is known to be nil.  For this, fields provide the `state` property, whose values are in the `LoadState` enum:
 
