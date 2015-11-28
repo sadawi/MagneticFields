@@ -66,8 +66,14 @@ age --> { value in
 
 The `-->` operator can also be used to create a link between two fields.  `sourceField --> destinationField` will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
 
-The relation can also be made bidirectional using the `<-->` operator.  In that case, both fields will initially have the value of the field on the right-hand side, and subsequent changes to either will be propagated to the other.
+The relation can be made bidirectional using the `<-->` operator.  In that case, both fields will initially have the value of the field on the right-hand side, and subsequent changes to either will be propagated to the other.
 
+The `-->` operator can also take a block to transform values:
+
+```swift
+purchase.dollars --> purchase.cents { $0 * 100 }
+purchase.dollars --> { $0 * 100 } --> purchase.cents
+```
 
 ## License
 
