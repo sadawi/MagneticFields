@@ -39,7 +39,10 @@ class FieldTests: XCTestCase {
     
     func testStates() {
         let entity = Entity()
-        XCTAssert(entity.name.state == .NotLoaded)
+        XCTAssertEqual(entity.name.state, LoadState.NotSet)
+        
+        entity.name.value = "Bob"
+        XCTAssertEqual(entity.name.state, LoadState.Set)
     }
     
     func testOperators() {

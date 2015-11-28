@@ -118,14 +118,14 @@ It can be useful to distinguish between a value that's nil because hasn't been l
 
 ```swift
 public enum LoadState {
-    case NotLoaded
+    case NotSet
+    case Set
     case Loading
-    case Loaded
     case Error
 }
 ```
 
-All fields are initially in the `.NotLoaded` state, but automatically become `.Loaded` when their value is set to anything.
+All fields are initially in the `.NotSet` state, but automatically become `.Set` when their value is set to anything.
 
 The `.Loading` state can be useful when the process of loading takes time.  You might decide to show a spinner in the UI while making an API request, for example.
 

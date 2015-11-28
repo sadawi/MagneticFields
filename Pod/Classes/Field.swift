@@ -9,9 +9,9 @@
 import Foundation
 
 public enum LoadState {
-    case NotLoaded
+    case NotSet
+    case Set
     case Loading
-    case Loaded
     case Error
 }
 
@@ -38,12 +38,12 @@ public class BaseField<T>: FieldType, FieldObserver {
     }
     
     private func valueUpdated(oldValue oldValue:T?, newValue: T?) {
-        self.state = .Loaded
+        self.state = .Set
         self.validationState = .Unknown
         self.updatedAt = NSDate()
     }
     
-    public var state:LoadState = .NotLoaded
+    public var state:LoadState = .NotSet
     public var error:ErrorType?
     public var name:String?
     
@@ -140,7 +140,7 @@ public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {
 public class ArrayField<T:Equatable>: BaseField<[T]> {
     public override var value:[T]? {
         didSet {
-            self.state = .Loaded
+            self.state = .Set
             var changed = false
             if oldValue != nil && self.value != nil {
                 changed = oldValue! != self.value!
