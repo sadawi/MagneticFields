@@ -99,7 +99,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     private var observations:[Int:Observation<T>] = [:]
 
-    public func addObserver(observer:FieldObserver?=nil, action:(BaseField<T> -> Void)?=nil) -> Observation<T> {
+    public func addObserver(observer:FieldObserver?=nil, action:(T? -> Void)?=nil) -> Observation<T> {
         let observation = Observation(owner: observer, observer: observer, action: action, date: NSDate())
         self.observations[observation.key] = observation
         observation.call(self)

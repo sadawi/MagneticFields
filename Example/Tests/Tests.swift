@@ -62,13 +62,13 @@ class FieldTests: XCTestCase {
         XCTAssertEqual(view.value, "Alice")
         
         var value:String = "test"
-        entity.name --> { value = $0.value! }
+        entity.name --> { value = $0! }
         entity.name.value = "NEW VALUE"
         XCTAssertEqual(value, "NEW VALUE")
         
         // Setting a new pure closure observer will remove the old one
         var value2:String = "another value"
-        entity.name --> { value2 = $0.value! }
+        entity.name --> { value2 = $0! }
         entity.name.value = "VALUE 2"
         XCTAssertEqual(value2, "VALUE 2")
         XCTAssertEqual(value, "NEW VALUE")

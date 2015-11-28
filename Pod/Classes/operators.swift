@@ -22,7 +22,7 @@ public func --><T>(observedField:Field<T>, observer:FieldObserver) -> Observatio
     return observedField.addObserver(observer)
 }
 
-public func --><T>(observedField:Field<T>, onChange:(BaseField<T> -> Void)) -> Observation<T> {
+public func --><T>(observedField:Field<T>, onChange:(T? -> Void)) -> Observation<T> {
     return observedField.addObserver(action: onChange)
 }
 

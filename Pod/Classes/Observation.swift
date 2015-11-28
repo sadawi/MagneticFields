@@ -11,12 +11,12 @@ import Foundation
 public struct Observation<T> {
     var owner:AnyObject?
     var observer:FieldObserver?
-    var action:(BaseField<T> -> Void)?
+    var action:(T? -> Void)?
     var date:NSDate?
     
     func call(field:BaseField<T>) {
         if let action = action {
-            action(field)
+            action(field.value)
         } else if let observer = self.observer {
             observer.fieldValueChanged(field.value, field: field)
         }
