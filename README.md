@@ -88,7 +88,7 @@ sourceField <--> destinationField
 ```
 Here, both fields will initially have the value of `destinationField`, and subsequent changes to either will be propagated to the other.
 
-We can still register a closure even if no observer is given.  This is effectively registering the closure with a `nil` observer, and so doing this again will replace the old closure.
+We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
 
 ```swift
 age --> { value in 
