@@ -70,7 +70,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     private var observers:NSMutableSet = NSMutableSet()
     private var onChange:(BaseField<T> -> Void)?
     public var changedAt:NSDate?
-        
+    
     public init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
         self.value = value
         self.name = name

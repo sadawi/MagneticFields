@@ -110,7 +110,7 @@ class FieldTests: XCTestCase {
     }
     
     class ValidatedPerson {
-        let age = Field<Int>().require(message: "Age must be greater than zero") { $0 > 0 }
+        let age = Field<Int>().require { $0 > 0 }
         let name = Field<String>()
     }
     
