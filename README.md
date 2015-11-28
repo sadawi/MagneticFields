@@ -58,7 +58,7 @@ Fields will automatically have the following timestamps:
 
 ### Observers
 
-A field can have any number of registered observer objects.  The `-->` is a shortcut for many observation patterns.
+A field can have any number of registered observer objects.  The `-->` operator is a shortcut for many observation patterns.  Observation events are triggered once when the observer is added, and after that whenever a field value is set.
 
 An observer can be added if it implements the `FieldObserver` protocol:
 
