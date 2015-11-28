@@ -58,7 +58,7 @@ Fields will automatically have the following timestamps:
 
 ### Observers
 
-A field can have any number of registered observer objects.  The `-->` operator is a shortcut for many observation patterns.  Observation events are triggered once when the observer is added, and after that whenever a field value is set.
+A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method.  Observation events are triggered once when the observer is added, and after that whenever a field value is set.
 
 An observer can be added if it implements the `FieldObserver` protocol:
 
@@ -100,6 +100,8 @@ The `-->` operator can be chained through any combination of closures and fields
 ```swift
 purchase.dollars --> { $0 * 100 } --> purchase.cents --> { print("I spent \($0) cents") }
 ```
+
+Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()` or by `field --> nil`
 
 ## License
 
