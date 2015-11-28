@@ -134,10 +134,13 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     public override init(value:T?=nil, name:String?=nil, allowedValues:[T]?=nil) {
         super.init(value: value, name: name, allowedValues: allowedValues)
     }
+    
+    public var changedAt:NSDate?
 
     private override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
         super.valueUpdated(oldValue: oldValue, newValue: newValue)
         if oldValue != self.value {
+            self.changedAt = NSDate()
             self.valueChanged()
         }
     }
