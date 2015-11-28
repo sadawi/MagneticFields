@@ -15,10 +15,18 @@ public enum LoadState {
     case Error
 }
 
-public enum ValidationState {
+public enum ValidationState:Equatable {
     case Unknown
-    case Invalid
+    case Invalid([String])
     case Valid
+}
+public func ==(lhs:ValidationState, rhs:ValidationState) -> Bool {
+    switch (lhs, rhs) {
+    case (.Unknown, .Unknown): return true
+    case (.Valid, .Valid): return true
+    case (let .Invalid(leftMessages), let .Invalid(rightMessages)): return leftMessages == rightMessages
+    default: return false
+    }
 }
 
 public protocol FieldType:AnyObject { }
@@ -53,8 +61,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     public var valid:Bool {
         get {
-            self.validate()
-            return self.validationState == .Valid
+            return self.validate() == .Valid
         }
     }
     
@@ -72,14 +79,19 @@ public class BaseField<T>: FieldType, FieldObserver {
     public var validators:[Validator<T>] = []
     private var validationState:ValidationState = .Unknown
 
-    private func validate() {
+    public func validate() -> ValidationState {
         if self.validationState == .Unknown {
             var valid = true
+            var messages:[String] = []
             for validator in self.validators {
-                valid = valid && validator.validate(self.value)
+                if validator.validate(self.value) == false {
+                    valid = false
+                    messages.append(validator.message)
+                }
             }
-            self.validationState = valid ? .Valid : .Invalid
+            self.validationState = valid ? .Valid : .Invalid(messages)
         }
+        return self.validationState
     }
     
     public func require(message message:String?=nil, presence:Bool=false, rule:(T -> Bool)?=nil) -> Self {

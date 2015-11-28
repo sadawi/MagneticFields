@@ -129,6 +129,7 @@ class FieldTests: XCTestCase {
     
     class ValidatedPerson {
         let age = Field<Int>().require { $0 > 0 }
+        let evenNumber = Field<Int>().require(message: "must be even") { $0 % 2 == 0 }
         let name = Field<String>()
     }
     
@@ -141,6 +142,10 @@ class FieldTests: XCTestCase {
         
         person.age.value = 10
         XCTAssert(person.age.valid == true)
+        
+        person.evenNumber.value = 3
+        XCTAssertFalse(person.evenNumber.valid)
+        XCTAssertEqual(ValidationState.Invalid(["must be even"]), person.evenNumber.validate())
     }
     
     func testTimestamps() {

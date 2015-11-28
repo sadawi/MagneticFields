@@ -10,11 +10,11 @@ import Foundation
 
 public class Validator<ValueType> {
     var rule:(ValueType -> Bool)?
-    var message:String?
+    var message:String
     var allowNil:Bool
     
     init(message:String?=nil, rule:(ValueType -> Bool)?=nil, allowNil:Bool = true) {
-        self.message = message
+        self.message = message ?? "is invalid"
         self.rule = rule
         self.allowNil = allowNil
     }
