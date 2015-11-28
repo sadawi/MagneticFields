@@ -51,29 +51,25 @@ Fields will automatically have the following timestamps:
 
 A field can have any number of registered observer objects.  The `-->` is a shortcut for many observation patterns.
 
-An observer can be provided by itself if it implements the `FieldObserver` protocol:
+An observer can be added if it implements the `FieldObserver` protocol:
 
 ```swift
-field.addObserver(observer)
 field --> observer
 ```
 
 Or, if it implements `Hashable`, a closure can be provided:
 ```swift
-field.addObserver(observer) { value in
-  print(value)
-}
 field --> observer { value in
   print(value)
 }
 ```
 
-`Field` itself implements `FieldObserver`, and the `-->` operator can also be used to create a link between two fields.
+`Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two fields.
 
 ```swift
 sourceField --> destinationField
 ```
-will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
+This will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
 
 The relation can be made bidirectional using the `<-->` operator:
 
