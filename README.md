@@ -102,7 +102,7 @@ The `-->` operator can be chained through any combination of closures and fields
 purchase.dollars --> { $0 * 100 } --> purchase.cents --> { print("I spent \($0) cents") }
 ```
 
-Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()` or by `field --> nil`
+Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()`.
 
 ## Load State
 
