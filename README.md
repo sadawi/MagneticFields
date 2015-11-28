@@ -67,7 +67,7 @@ An observer can be added if it implements the `FieldObserver` protocol:
 field --> observer
 ```
 
-Or, if it implements `Hashable`, a closure can be provided:
+Or, if it implements `Hashable`, a closure can be provided.  Only one closure can be associated with each observer.
 ```swift
 field --> observer { value in
   print(value)
@@ -88,7 +88,7 @@ sourceField <--> destinationField
 ```
 Here, both fields will initially have the value of `destinationField`, and subsequent changes to either will be propagated to the other.
 
-A field can have a single onChange closure.
+We can still register a closure even if no observer is given.  This is effectively registering the closure with a `nil` observer, and so doing this again will replace the old closure.
 
 ```swift
 age --> { value in 
