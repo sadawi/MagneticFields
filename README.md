@@ -28,8 +28,10 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 ### Basic
 
 ```swift
-let age = Field<Int>()
-age.value = 10
+class Person {
+  let age = Field<Int>()
+}
+person.age.value = 10
 ```
 
 ### Validations
