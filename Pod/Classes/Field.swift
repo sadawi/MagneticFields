@@ -30,10 +30,14 @@ public protocol FieldObserver:AnyObject {
 public class BaseField<T>: FieldType, FieldObserver {
     public var value:T? {
         didSet {
-            self.state = .Loaded
-            self.validationState = .Unknown
-            self.updatedAt = NSDate()
+            self.valueUpdated(oldValue: oldValue, newValue: self.value)
         }
+    }
+    
+    private func valueUpdated(oldValue oldValue:T?, newValue: T?) {
+        self.state = .Loaded
+        self.validationState = .Unknown
+        self.updatedAt = NSDate()
     }
     
     public var state:LoadState = .NotLoaded
@@ -131,15 +135,14 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         super.init(value: value, name: name, allowedValues: allowedValues)
     }
 
-    public override var value:T? {
-        didSet {
-            self.state = .Loaded
-            if oldValue != self.value {
-                self.valueChanged()
-            }
+    private override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
+        super.valueUpdated(oldValue: oldValue, newValue: newValue)
+        if oldValue != self.value {
+            self.valueChanged()
         }
     }
 }
+
 public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {
     return left.value == right.value
 }
