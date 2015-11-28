@@ -155,6 +155,20 @@ class FieldTests: XCTestCase {
         XCTAssertGreaterThan(a.name.updatedAt!.timeIntervalSince1970, b.name.updatedAt!.timeIntervalSince1970)
 
         XCTAssertGreaterThan(b.name.changedAt!.timeIntervalSince1970, a.name.changedAt!.timeIntervalSince1970)
-
     }
+    
+//    func testChaining() {
+//        let a = Entity()
+//        let b = Entity()
+//        
+//        a.name.value = "Alice"
+//        b.name.value = "Betty"
+//        
+//        a.name --> { $0.value?.uppercaseString } --> b.name
+//        
+//        XCTAssertEqual(b.name.value, "ALICE")
+//        
+//        a.name.value = "Arnold"
+//        XCTAssertEqual(b.name.value, "ARNOLD")
+//    }
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Observation<T> {
+public struct Observation<T> {
     var owner:AnyObject?
     var observer:FieldObserver?
     var action:(BaseField<T> -> Void)?

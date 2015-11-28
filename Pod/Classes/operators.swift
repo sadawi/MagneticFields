@@ -18,12 +18,12 @@ public func <--<T>(observer:FieldObserver, observedField:Field<T>) {
     observedField.addObserver(observer)
 }
 
-public func --><T>(observedField:Field<T>, observer:FieldObserver) {
-    observedField.addObserver(observer)
+public func --><T>(observedField:Field<T>, observer:FieldObserver) -> Observation<T> {
+    return observedField.addObserver(observer)
 }
 
-public func --><T>(observedField:Field<T>, onChange:(BaseField<T> -> Void)) {
-    observedField.addObserver(action: onChange)
+public func --><T>(observedField:Field<T>, onChange:(BaseField<T> -> Void)) -> Observation<T> {
+    return observedField.addObserver(action: onChange)
 }
 
 public func -/-><T>(observedField:Field<T>, observer:FieldObserver) {
