@@ -68,11 +68,10 @@ The `-->` operator can also be used to create a link between two fields.  `sourc
 
 The relation can be made bidirectional using the `<-->` operator.  In that case, both fields will initially have the value of the field on the right-hand side, and subsequent changes to either will be propagated to the other.
 
-The `-->` operator can also take a block to transform values:
+The `-->` operator can be chained through any combination of closures and fields.
 
 ```swift
-purchase.dollars --> purchase.cents { $0 * 100 }
-purchase.dollars --> { $0 * 100 } --> purchase.cents
+purchase.dollars --> { $0 * 100 } --> purchase.cents --> { print("I spent \($0) cents") }
 ```
 
 ## License
