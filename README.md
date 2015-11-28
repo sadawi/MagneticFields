@@ -5,6 +5,13 @@
 [![License](https://img.shields.io/cocoapods/l/MagneticFields.svg?style=flat)](http://cocoapods.org/pods/MagneticFields)
 [![Platform](https://img.shields.io/cocoapods/p/MagneticFields.svg?style=flat)](http://cocoapods.org/pods/MagneticFields)
 
+## Overview
+
+MagneticFields is a library for adding fields to your model objects.  It'll give you:
+* type-safe change observation
+* automatic timestamps
+* validations
+
 ## Installation
 
 MagneticFields is available through [CocoaPods](http://cocoapods.org). To install
