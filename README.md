@@ -49,14 +49,16 @@ Fields will automatically have the following timestamps:
 
 ### Observers
 
-A field can have any number of registered observer objects, which must conform to the `FieldObserver` protocol.  The `-->` is a shortcut for many observation patterns.
+A field can have any number of registered observer objects.  The `-->` is a shortcut for many observation patterns.
+
+An observer can be provided by itself if it implements the `FieldObserver` protocol:
 
 ```swift
 field.addObserver(observer)
 field --> observer
 ```
 
-Observers can conform to `Hashable` and a closure can be provided:
+Or, if it implements `Hashable`, a closure can be provided:
 ```swift
 field.addObserver(observer) { value in
   print(value)
@@ -66,6 +68,10 @@ field --> observer { value in
 }
 ```
 
+`Field` itself implements `FieldObserver`, and the `-->` operator can also be used to create a link between two fields.  `sourceField --> destinationField` will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
+
+The relation can be made bidirectional using the `<-->` operator.  In that case, both fields will initially have the value of the field on the right-hand side, and subsequent changes to either will be propagated to the other.
+
 A field can have a single onChange closure.
 
 ```swift
@@ -73,10 +79,6 @@ age --> { value in
   print("Age was changed to \(value)")
 }
 ```
-
-`Field` itself implements `FieldObserver`, and the `-->` operator can also be used to create a link between two fields.  `sourceField --> destinationField` will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
-
-The relation can be made bidirectional using the `<-->` operator.  In that case, both fields will initially have the value of the field on the right-hand side, and subsequent changes to either will be propagated to the other.
 
 The `-->` operator can be chained through any combination of closures and fields.
 
