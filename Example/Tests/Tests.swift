@@ -141,4 +141,22 @@ class FieldTests: XCTestCase {
         person.age.value = 10
         XCTAssert(person.age.valid == true)
     }
+    
+    func testTimestamps() {
+        let a = Entity()
+        let b = Entity()
+        
+        a.name.value = "John"
+        b.name.value = "Bob"
+        
+        XCTAssertGreaterThan(b.name.updatedAt!.timeIntervalSince1970, a.name.updatedAt!.timeIntervalSince1970)
+        XCTAssertGreaterThan(b.name.changedAt!.timeIntervalSince1970, a.name.changedAt!.timeIntervalSince1970)
+        
+        a.name.value = "John"
+        
+        XCTAssertGreaterThan(a.name.updatedAt!.timeIntervalSince1970, b.name.updatedAt!.timeIntervalSince1970)
+
+        XCTAssertGreaterThan(b.name.changedAt!.timeIntervalSince1970, a.name.changedAt!.timeIntervalSince1970)
+
+    }
 }
