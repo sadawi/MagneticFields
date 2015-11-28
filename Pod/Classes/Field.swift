@@ -32,6 +32,7 @@ public class BaseField<T>: FieldType, FieldObserver {
         didSet {
             self.state = .Loaded
             self.validationState = .Unknown
+            self.updatedAt = NSDate()
         }
     }
     
@@ -40,14 +41,14 @@ public class BaseField<T>: FieldType, FieldObserver {
     public var name:String?
     public var allowedValues:[T] = []
     public var validators:[Validator<T>] = []
+    
+    public var updatedAt:NSDate?
 
     private var validationState:ValidationState = .Unknown
     
     public var valid:Bool {
         get {
-            if self.validationState == .Unknown {
-                self.validate()
-            }
+            self.validate()
             return self.validationState == .Valid
         }
     }
@@ -83,7 +84,7 @@ public class BaseField<T>: FieldType, FieldObserver {
         }
     }
     
-    public func require(message:String?=nil, presence:Bool=false, rule:(T -> Bool)?=nil) -> Self {
+    public func require(message message:String?=nil, presence:Bool=false, rule:(T -> Bool)?=nil) -> Self {
         let validator = Validator<T>(message:message, rule: rule, allowNil: !presence)
         self.validators.append(validator)
         return self

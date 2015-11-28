@@ -127,13 +127,12 @@ class FieldTests: XCTestCase {
     
     
     class ValidatedPerson {
-        let age = Field<Int>().require(presence:true) { $0 > 0 }
+        let age = Field<Int>().require(message: "Age must be greater than zero") { $0 > 0 }
         let name = Field<String>()
     }
     
     func testValidators() {
         let person = ValidatedPerson()
-        XCTAssert(person.age.valid == false)        
         
         person.age.value = -10
         
