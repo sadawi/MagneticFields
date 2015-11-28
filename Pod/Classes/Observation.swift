@@ -9,7 +9,6 @@
 import Foundation
 
 public class Observation<T> {
-    var owner:AnyObject?
     var observer:FieldObserver?
     
     var action:(T? -> Void)?

@@ -101,7 +101,6 @@ public class BaseField<T>: FieldType, FieldObserver {
 
     public func addObserver(observer:FieldObserver?=nil, action:(T? -> Void)?=nil) -> Observation<T> {
         let observation = Observation<T>()
-        observation.owner = observer
         observation.observer = observer
         observation.action = action
         self.observations[observation.key] = observation
