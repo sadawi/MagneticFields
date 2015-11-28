@@ -84,14 +84,13 @@ sourceField --> destinationField
 ```
 This will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
 
-#### Bidirectional binding
-
-An observation can be made bidirectional using the `<-->` operator:
+The `<-->` operator is a shortcut for `<--` followed by `-->` (and can only be used between two Fields).
 
 ```swift
 field1 <--> field2
 ```
-Here, both fields will initially have the value of `field2`, and subsequent changes to either will be propagated to the other.
+
+Since `<--` is called first, both fields will initially have the value of `field2`.
 
 #### Without explicit observers
 
