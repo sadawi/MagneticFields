@@ -70,18 +70,28 @@ A field can have any number of registered observer objects.  The `-->` operator 
 
 ### Adding an observer
 
-An observer can be added if it implements the `FieldObserver` protocol:
+An observer can be added if it implements the `FieldObserver` protocol, which has a `fieldValueChanged(field, value: value)` method.
 
 ```swift
 field --> observer
 ```
 
-Or, if it implements `Hashable`, a closure can be provided.  Only one closure can be associated with each observer.
+Or, if it implements `Hashable`, a closure can be provided.  In this case, the observer is used only to register as the owner of the observation. Only one closure can be associated with each observer.
+
 ```swift
 field --> observer { value in
   print(value)
 }
 ```
+
+We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
+
+```swift
+age --> { value in 
+  print("Age was changed to \(value)")
+}
+```
+
 ### Binding a field to another field
 
 `Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two fields.
@@ -98,16 +108,6 @@ field1 <--> field2
 ```
 
 Since `<--` is called first, both fields will initially have the value of `field2`.
-
-### Without explicit observers
-
-We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
-
-```swift
-age --> { value in 
-  print("Age was changed to \(value)")
-}
-```
 
 ### Chaining
 
