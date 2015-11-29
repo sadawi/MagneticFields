@@ -11,7 +11,7 @@ MagneticFields is a library for adding fields to your model objects.  It'll give
 * load state
 
 ## Installation
-
+lin
 MagneticFields is available through [CocoaPods](http://cocoapods.org). To install it, add the following line to your Podfile:
 
 ```ruby
@@ -94,7 +94,7 @@ age --> { value in
 
 ### Binding a field to another field
 
-`Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two fields.
+`Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two field values.
 
 ```swift
 sourceField --> destinationField
