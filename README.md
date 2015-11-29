@@ -12,8 +12,7 @@ MagneticFields is a library for adding fields to your model objects.  It'll give
 
 ## Installation
 
-MagneticFields is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+MagneticFields is available through [CocoaPods](http://cocoapods.org). To install it, add the following line to your Podfile:
 
 ```ruby
 pod "MagneticFields"
@@ -45,6 +44,19 @@ let age = Field<Int>().require { $0 > 0 }.require { $0 % 2 == 0 }
 ```
 
 By default, `nil` values will be considered valid.  To change that for a given rule, pass `allowNil: false` to `require`.
+
+To validate a field value, either call `field.valid` (returning a `Bool`) or `field.validate()`, which returns a `ValidationState` enum:
+
+```swift
+public enum ValidationState:Equatable {
+    case Unknown
+    case Invalid([String])
+    case Valid
+}
+```
+
+The associated value of the `.Invalid` case is a list of error messages (e.g., `["must be greater than 0", "is required"]`).
+
 
 ## Timestamps
 
