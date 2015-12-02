@@ -29,7 +29,16 @@ public func ==(lhs:ValidationState, rhs:ValidationState) -> Bool {
     }
 }
 
-public protocol FieldType:AnyObject { }
+public protocol FieldType:AnyObject {
+    var anyObjectValue: AnyObject? { get }
+    var name: String? { get set }
+    var priority: Int { get set }
+    var key: String? { get set }
+    
+    func addValidationError(message:String)
+    func resetValidationState()
+    func validate() -> ValidationState
+}
 
 public protocol FieldObserver:AnyObject {
     func fieldValueChanged(value:Any?, field:FieldType?)
@@ -49,11 +58,27 @@ public class BaseField<T>: FieldType, FieldObserver {
     public var name:String?
     
     /**
+        Desired position in forms
+    */
+    public var priority:Int = 0
+
+    /**
+        An internal identifier (e.g., for identifying form fields)
+    */
+    public var key:String?
+    
+    /**
         The value contained in this field.  Note: it's always Optional.
     */
     public var value:T? {
         didSet {
             self.valueUpdated(oldValue: oldValue, newValue: self.value)
+        }
+    }
+    
+    public var anyObjectValue:AnyObject? {
+        get {
+            return self.value as? AnyObject
         }
     }
     
@@ -70,13 +95,12 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     /**
         Initialize a new field.
-        
-        - parameter value: The field's initial value
-        - parameter name: A human-readable name for this field
     */
-    public init(value:T?=nil, name:String?=nil) {
+    public init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
         self.value = value
         self.name = name
+        self.priority = priority
+        self.key = key
     }
     
     // MARK: - Validation
@@ -111,6 +135,21 @@ public class BaseField<T>: FieldType, FieldObserver {
             self.validationState = valid ? .Valid : .Invalid(messages)
         }
         return self.validationState
+    }
+    
+    public func resetValidationState() {
+        self.validationState = .Unknown
+    }
+    
+    // TODO: think about this. If I set an error manually, validate() won't run the validators.
+    public func addValidationError(message:String) {
+        switch self.validationState {
+        case .Invalid(var messages):
+            messages.append(message)
+            self.validationState = .Invalid(messages)
+        default:
+            self.validationState = .Invalid([message])
+        }
     }
     
     /**
@@ -176,8 +215,8 @@ public class BaseField<T>: FieldType, FieldObserver {
 }
 
 public class Field<T:Equatable>: BaseField<T>, Equatable {
-    public override init(value:T?=nil, name:String?=nil) {
-        super.init(value: value, name: name)
+    public override init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
+        super.init(value: value, name: name, priority: priority)
     }
     
     private override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
@@ -210,9 +249,26 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         }
     }
     
-    public override init(value:[T]?=nil, name:String?=nil) {
-        super.init(name: name)
+    public override init(value:[T]?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
+        super.init(name: name, priority: priority)
         self.value = value
     }
-
+    
+    public func appendValue(value:T) {
+        if self.value?.indexOf(value) == nil {
+            self.value?.append(value)
+        }
+    }
+    
+    public func removeValue(value:T) {
+        if let index = self.value?.indexOf(value) {
+            self.value?.removeAtIndex(index)
+        }
+    }
 }
+
+//
+//
+//public protocol ListableEnum: Equatable {
+//    var allValues:[Any] { get }
+//}
