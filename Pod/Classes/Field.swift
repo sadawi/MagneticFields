@@ -138,7 +138,9 @@ public class BaseField<T>: FieldType, FieldObserver {
             for validator in self.validationRules {
                 if validator.validate(self.value) == false {
                     valid = false
-                    messages.append(validator.message)
+                    if let message = validator.message {
+                        messages.append(message)
+                    }
                 }
             }
             self.validationState = valid ? .Valid : .Invalid(messages)
@@ -168,12 +170,16 @@ public class BaseField<T>: FieldType, FieldObserver {
         - parameter allowNil: Whether nil values should be considered valid
         - parameter rule: A closure containing validation logic for an unwrapped field value
     */
-    public func require(message message:String?=nil, allowNil:Bool=true, rule:(T -> Bool)?=nil) -> Self {
-        let rule = ValidationRule<T>(message:message, rule: rule, allowNil: allowNil)
-        return self.require(rule: rule)
+    public func require(message message:String?=nil, allowNil:Bool=true, test:(T -> Bool)) -> Self {
+        let rule = ValidationRule<T>(test: test, message:message, allowNil: allowNil)
+        return self.require(rule)
     }
     
-    public func require(rule rule: ValidationRule<T>) -> Self {
+    public func requireNotNil() -> Self {
+        return self.require(message: "is required", allowNil:false) { T -> Bool in return true }
+    }
+    
+    public func require(rule: ValidationRule<T>) -> Self {
         self.validationRules.append(rule)
         return self
     }

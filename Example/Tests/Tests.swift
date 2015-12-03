@@ -132,7 +132,8 @@ class FieldTests: XCTestCase {
         let evenNumber      = Field<Int>().require(message: "must be even") { $0 % 2 == 0 }
         let name            = Field<String>()
         
-        let requiredField   = Field<String>().require(allowNil:false)
+        let requiredField   = Field<String>().requireNotNil()
+        let longString      = Field<String>().require(LengthRule(minimum:10))
     }
     
     func testValidators() {
@@ -152,6 +153,11 @@ class FieldTests: XCTestCase {
         XCTAssertFalse(person.requiredField.valid)
         person.requiredField.value = "hello"
         XCTAssertTrue(person.requiredField.valid)
+        
+        person.longString.value = "123456789"
+        XCTAssertFalse(person.longString.valid)
+        person.longString.value = "123456789A"
+        XCTAssertTrue(person.longString.valid)
     }
     
     func testTimestamps() {
