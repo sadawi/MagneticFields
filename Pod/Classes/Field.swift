@@ -85,6 +85,8 @@ public class BaseField<T>: FieldType, FieldObserver {
 
     public var anyValue:Any? {
         get {
+            // It's important to cast to `Any?` rather than `Any`.
+            // Casting to `Any` seems to hide the optional in a way that's hard to unwrap.
             return self.value as Any?
         }
     }
