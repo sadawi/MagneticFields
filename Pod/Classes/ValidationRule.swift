@@ -95,6 +95,7 @@ public class LengthRule: TransformerRule<String, Int> {
 public class NotBlankRule: ValidationRule<String> {
     override public init() {
         super.init()
+        self.message = "Value cannot be blank"
     }
     
     override public func validate(value: String?) -> Bool {
