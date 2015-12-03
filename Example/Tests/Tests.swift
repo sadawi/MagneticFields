@@ -160,6 +160,14 @@ class FieldTests: XCTestCase {
         XCTAssertTrue(person.longString.valid)
     }
     
+    func testMoreValidators() {
+        let notBlankString = Field<String>().require(NotBlankRule())
+        notBlankString.value = ""
+        XCTAssertFalse(notBlankString.valid)
+        notBlankString.value = "hi"
+        XCTAssertTrue(notBlankString.valid)
+    }
+    
     func testTimestamps() {
         let a = Entity()
         let b = Entity()
@@ -173,7 +181,6 @@ class FieldTests: XCTestCase {
         a.name.value = "John"
         
         XCTAssertGreaterThan(a.name.updatedAt!.timeIntervalSince1970, b.name.updatedAt!.timeIntervalSince1970)
-
         XCTAssertGreaterThan(b.name.changedAt!.timeIntervalSince1970, a.name.changedAt!.timeIntervalSince1970)
     }
     

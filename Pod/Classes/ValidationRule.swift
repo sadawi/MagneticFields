@@ -91,3 +91,18 @@ public class LengthRule: TransformerRule<String, Int> {
         self.rule = RangeRule(minimum: minimum, maximum: maximum)
     }
 }
+
+public class NotBlankRule: ValidationRule<String> {
+    override public init() {
+        super.init()
+    }
+    
+    override public func validate(value: String?) -> Bool {
+        if let v = value {
+            return v.characters.count > 0
+        } else {
+            return false
+        }
+    }
+
+}
