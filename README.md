@@ -11,19 +11,16 @@ MagneticFields is a library for adding fields to your model objects.  It'll give
 * load state
 
 ## Installation
-
-MagneticFields is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+lin
+MagneticFields is available through [CocoaPods](http://cocoapods.org). To install it, add the following line to your Podfile:
 
 ```ruby
 pod "MagneticFields"
 ```
 
-## Usage
-
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
-### Basic
+## Basic Usage
 
 ```swift
 class Person {
@@ -32,7 +29,7 @@ class Person {
 person.age.value = 10
 ```
 
-### Validations
+## Validations
 
 Simple closure validations:
 
@@ -48,33 +45,56 @@ let age = Field<Int>().require { $0 > 0 }.require { $0 % 2 == 0 }
 
 By default, `nil` values will be considered valid.  To change that for a given rule, pass `allowNil: false` to `require`.
 
-### Timestamps
+To validate a field value, either call `field.valid` (returning a `Bool`) or `field.validate()`, which returns a `ValidationState` enum:
+
+```swift
+public enum ValidationState:Equatable {
+    case Unknown
+    case Invalid([String])
+    case Valid
+}
+```
+
+The associated value of the `.Invalid` case is a list of error messages (e.g., `["must be greater than 0", "is required"]`).
+
+
+## Timestamps
 
 Fields will automatically have the following timestamps:
 * `updatedAt`: the last time any value was set
 * `changedAt`: the last time a new value was set (compared using `==`)
 
-### Observers
+## Observers
 
 A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method.  Observation events are triggered once when the observer is added, and after that whenever a field value is set.
 
-#### Adding an observer
+### Adding an observer
 
-An observer can be added if it implements the `FieldObserver` protocol:
+An observer can be added if it implements the `FieldObserver` protocol, which has a `fieldValueChanged(field, value: value)` method.
 
 ```swift
 field --> observer
 ```
 
-Or, if it implements `Hashable`, a closure can be provided.  Only one closure can be associated with each observer.
+Or, if it implements `Hashable`, a closure can be provided.  In this case, the observer is used only to register as the owner of the observation. Only one closure can be associated with each observer.
+
 ```swift
 field --> observer { value in
   print(value)
 }
 ```
-#### Binding a field to another field
 
-`Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two fields.
+We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
+
+```swift
+age --> { value in 
+  print("Age was changed to \(value)")
+}
+```
+
+### Binding a field to another field
+
+`Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two field values.
 
 ```swift
 sourceField --> destinationField
@@ -89,17 +109,7 @@ field1 <--> field2
 
 Since `<--` is called first, both fields will initially have the value of `field2`.
 
-#### Without explicit observers
-
-We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
-
-```swift
-age --> { value in 
-  print("Age was changed to \(value)")
-}
-```
-
-#### Chaining
+### Chaining
 
 The `-->` operator can be chained through any combination of closures and fields.
 
@@ -107,9 +117,11 @@ The `-->` operator can be chained through any combination of closures and fields
 purchase.dollars --> { $0 * 100 } --> purchase.cents --> { print("I spent \($0) cents") }
 ```
 
+### Unregistering
+
 Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()`.
 
-### Load State
+## Load State
 
 It can be useful to distinguish between a value that's nil because hasn't been loaded yet (e.g., from an API), and one that is known to be nil.  For this, fields provide the `state` property, whose values are in the `LoadState` enum:
 
@@ -125,7 +137,3 @@ public enum LoadState {
 All fields are initially in the `.NotSet` state, but automatically become `.Set` when their value is set to anything.
 
 The `.Loading` state can be useful when the process of loading takes time.  You might decide to show a spinner in the UI while making an API request, for example.
-
-## License
-
-MagneticFields is available under the MIT license. See the LICENSE file for more info.
