@@ -20,12 +20,14 @@ public class Validator<ValueType> {
     }
     
     public func validate(value:ValueType?) -> Bool {
-        if let unwrappedValue = value, rule = self.rule {
-            return rule(unwrappedValue)
-        } else if self.allowNil {
-            return true
+        if let unwrappedValue = value {
+            if let rule = self.rule {
+                return rule(unwrappedValue)
+            } else {
+                return true
+            }
         } else {
-            return false
+            return self.allowNil
         }
     }
 }
