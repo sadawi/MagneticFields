@@ -31,6 +31,7 @@ public func ==(lhs:ValidationState, rhs:ValidationState) -> Bool {
 
 public protocol FieldType:AnyObject {
     var anyObjectValue: AnyObject? { get }
+    var anyValue: Any? { get }
     var name: String? { get set }
     var priority: Int { get set }
     var key: String? { get set }
@@ -79,6 +80,12 @@ public class BaseField<T>: FieldType, FieldObserver {
     public var anyObjectValue:AnyObject? {
         get {
             return self.value as? AnyObject
+        }
+    }
+
+    public var anyValue:Any? {
+        get {
+            return self.value as Any?
         }
     }
     
