@@ -1,5 +1,5 @@
 //
-//  Validator.swift
+//  ValidationRule.swift
 //  Pods
 //
 //  Created by Sam Williams on 11/28/15.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class Validator<ValueType> {
+public class ValidationRule<ValueType> {
     var rule:(ValueType -> Bool)?
     var message:String
     var allowNil:Bool

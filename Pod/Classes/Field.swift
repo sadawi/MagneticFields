@@ -114,7 +114,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     // MARK: - Validation
 
-    private var validators:[Validator<T>] = []
+    private var validationRules:[ValidationRule<T>] = []
     private var validationState:ValidationState = .Unknown
 
     /**
@@ -135,7 +135,7 @@ public class BaseField<T>: FieldType, FieldObserver {
         if self.validationState == .Unknown {
             var valid = true
             var messages:[String] = []
-            for validator in self.validators {
+            for validator in self.validationRules {
                 if validator.validate(self.value) == false {
                     valid = false
                     messages.append(validator.message)
@@ -169,8 +169,12 @@ public class BaseField<T>: FieldType, FieldObserver {
         - parameter rule: A closure containing validation logic for an unwrapped field value
     */
     public func require(message message:String?=nil, allowNil:Bool=true, rule:(T -> Bool)?=nil) -> Self {
-        let validator = Validator<T>(message:message, rule: rule, allowNil: allowNil)
-        self.validators.append(validator)
+        let rule = ValidationRule<T>(message:message, rule: rule, allowNil: allowNil)
+        return self.require(rule: rule)
+    }
+    
+    public func require(rule rule: ValidationRule<T>) -> Self {
+        self.validationRules.append(rule)
         return self
     }
     
