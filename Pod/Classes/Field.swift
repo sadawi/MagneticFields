@@ -35,6 +35,7 @@ public protocol FieldType:AnyObject {
     var name: String? { get set }
     var priority: Int { get set }
     var key: String? { get set }
+    var validationState:ValidationState { get }
     
     func addValidationError(message:String)
     func resetValidationState()
@@ -115,7 +116,8 @@ public class BaseField<T>: FieldType, FieldObserver {
     // MARK: - Validation
 
     private var validationRules:[ValidationRule<T>] = []
-    private var validationState:ValidationState = .Unknown
+    
+    public  var validationState:ValidationState = .Unknown
 
     /**
         Test whether the current field value passes all the validation rules.
@@ -176,7 +178,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     }
     
     public func requireNotNil() -> Self {
-        return self.require(message: "is required", allowNil:false) { T -> Bool in return true }
+        return self.require(message: "Field is required", allowNil:false) { T -> Bool in return true }
     }
     
     public func require(rule: ValidationRule<T>) -> Self {
