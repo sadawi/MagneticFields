@@ -32,6 +32,7 @@ public func ==(lhs:ValidationState, rhs:ValidationState) -> Bool {
 public protocol FieldType:AnyObject {
     var anyObjectValue: AnyObject? { get }
     var anyValue: Any? { get }
+    var valueType:Any.Type { get }
     var name: String? { get set }
     var priority: Int { get set }
     var key: String? { get set }
@@ -40,37 +41,49 @@ public protocol FieldType:AnyObject {
     func addValidationError(message:String)
     func resetValidationState()
     func validate() -> ValidationState
+    
+    func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?)
+    func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?)
+
+//    func readFromDictionary(dictionary:[String:AnyObject], name: String)
+//    func writeToDictionary(inout dictionary:[String:AnyObject], name: String)
 }
 
 public protocol FieldObserver:AnyObject {
     func fieldValueChanged(value:Any?, field:FieldType?)
 }
 
-let defaultObserverKey:NSString = "____"
+let DefaultObserverKey:NSString = "____"
+let DefaultValueTransformerKey = "default"
 
 public class BaseField<T>: FieldType, FieldObserver {
+    
+    public var valueType:Any.Type {
+        return T.self
+    }
+    
     /**
-        Information about whether this field's value has been set
+    Information about whether this field's value has been set
     */
     public var state:LoadState = .NotSet
     
     /**
-        A human-readable name for this field.
+    A human-readable name for this field.
     */
     public var name:String?
     
     /**
-        Desired position in forms
+    Desired position in forms
     */
     public var priority:Int = 0
-
+    
     /**
-        An internal identifier (e.g., for identifying form fields)
+    An internal identifier (e.g., for identifying form fields)
     */
     public var key:String?
     
     /**
-        The value contained in this field.  Note: it's always Optional.
+    The value contained in this field.  Note: it's always Optional.
     */
     public var value:T? {
         didSet {
@@ -83,7 +96,7 @@ public class BaseField<T>: FieldType, FieldObserver {
             return self.value as? AnyObject
         }
     }
-
+    
     public var anyValue:Any? {
         get {
             // It's important to cast to `Any?` rather than `Any`.
@@ -101,12 +114,12 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     public var changedAt:NSDate?
     public var updatedAt:NSDate?
-
+    
     
     /**
-        Initialize a new field.
+    Initialize a new field.
     */
-    public init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
+    init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
         self.value = value
         self.name = name
         self.priority = priority
@@ -114,24 +127,24 @@ public class BaseField<T>: FieldType, FieldObserver {
     }
     
     // MARK: - Validation
-
+    
     private var validationRules:[ValidationRule<T>] = []
     
     public  var validationState:ValidationState = .Unknown
-
+    
     /**
-        Test whether the current field value passes all the validation rules.
+    Test whether the current field value passes all the validation rules.
     */
     public var valid:Bool {
         get {
             return self.validate() == .Valid
         }
     }
-
-    /**
-        Test whether the current field value passes all the validation rules.
     
-        - returns: A ValidationState that includes error messages, if applicable.
+    /**
+    Test whether the current field value passes all the validation rules.
+    
+    - returns: A ValidationState that includes error messages, if applicable.
     */
     public func validate() -> ValidationState {
         if self.validationState == .Unknown {
@@ -166,11 +179,11 @@ public class BaseField<T>: FieldType, FieldObserver {
     }
     
     /**
-        Adds a validation rule to the field.
+    Adds a validation rule to the field.
     
-        - parameter message: A message explaining why validation failed, in the form of a partial sentence (e.g., "must be zonzero")
-        - parameter allowNil: Whether nil values should be considered valid
-        - parameter rule: A closure containing validation logic for an unwrapped field value
+    - parameter message: A message explaining why validation failed, in the form of a partial sentence (e.g., "must be zonzero")
+    - parameter allowNil: Whether nil values should be considered valid
+    - parameter rule: A closure containing validation logic for an unwrapped field value
     */
     public func require(message message:String?=nil, allowNil:Bool=true, test:(T -> Bool)) -> Self {
         let rule = ValidationRule<T>(test: test, message:message, allowNil: allowNil)
@@ -196,13 +209,13 @@ public class BaseField<T>: FieldType, FieldObserver {
     // MARK: - Observation
     
     private var observations:[Int:Observation<T>] = [:]
-
-    /**
-        Registers a value change observer, which can either be a FieldObserver object or a closure.
-        Registering an observerless closure will replace any previous closure.
     
-        - parameter observer: a FieldObserver object that will receive change notifications
-        - parameter action: a closure to handle changes
+    /**
+    Registers a value change observer, which can either be a FieldObserver object or a closure.
+    Registering an observerless closure will replace any previous closure.
+    
+    - parameter observer: a FieldObserver object that will receive change notifications
+    - parameter action: a closure to handle changes
     */
     public func addObserver(observer:FieldObserver?=nil, action:(T? -> Void)?=nil) -> Observation<T> {
         let observation = Observation<T>(observer:observer, action:action)
@@ -212,14 +225,14 @@ public class BaseField<T>: FieldType, FieldObserver {
     }
     
     /**
-        Unregisters an observer
+    Unregisters an observer
     */
     public func removeObserver(observer:FieldObserver) {
         self.observations[Observation<T>.keyForObserver(observer)] = nil
     }
     
     /**
-        Unregisters all observers and closures.
+    Unregisters all observers and closures.
     */
     public func removeAllObservers() {
         self.observations = [:]
@@ -233,11 +246,53 @@ public class BaseField<T>: FieldType, FieldObserver {
             self.value = observedField.value
         }
     }
+    
+    // MARK: - Dictionary values
+    
+    /**
+    Given a dictionary of many values, extracts the relevant ones for this field and updates self.
+    */
+    public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+    }
+    
+    /**
+    Adds data needed to reconstruct self to a dictionary containing many values.
+    */
+    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+        dictionary[name] = nil
+    }
+    
 }
 
 public class Field<T:Equatable>: BaseField<T>, Equatable {
+    public var valueTransformers:[String:ValueTransformer<T>] = [:]
+    
     public override init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
-        super.init(value: value, name: name, priority: priority)
+        super.init(value: value, name: name, priority: priority, key: key)
+        self.valueTransformers = [DefaultValueTransformerKey: self.defaultValueTransformer()]
+    }
+    
+    public func transform(transformerName:String, transformer:ValueTransformer<T>) -> Self {
+        self.valueTransformers[transformerName] = transformer
+        return self
+    }
+    
+    /**
+    Adds a value transformer (with optional name) for this field.
+    
+    - parameter transformerName: A string used to identify this transformer. If omitted, will be the default transformer.
+    - parameter importValue: A closure mapping an external value (e.g., a string) to a value for this field.
+    - parameter exportValue: A closure mapping a field value to an external value
+    */
+    public func transform(transformerName: String?=nil, importValue:(AnyObject? -> T?), exportValue:(T? -> AnyObject?)) -> Self {
+        
+        self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = ValueTransformer(importAction: importValue, exportAction: exportValue)
+        return self
+    }
+    
+    // TODO: don't repeat this.
+    public func defaultValueTransformer() -> ValueTransformer<T> {
+        return SimpleValueTransformer<T>()
     }
     
     private override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
@@ -246,6 +301,19 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
             self.valueChanged()
         }
     }
+    
+    // MARK: - Dictionary values
+    
+    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+        if let dictionaryValue = dictionary[name] {
+            self.value = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.importValue(dictionaryValue)
+        }
+    }
+    
+    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+        dictionary[name] = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue(self.value)
+    }
+    
 }
 
 public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {
@@ -253,6 +321,8 @@ public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {
 }
 
 public class ArrayField<T:Equatable>: BaseField<[T]> {
+    public var valueTransformers:[String:ValueTransformer<T>] = [:]
+    
     public override var value:[T]? {
         didSet {
             self.state = .Set
@@ -269,10 +339,20 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
             }
         }
     }
+
+    public func transform(transformerName:String, transformer:ValueTransformer<T>) -> Self {
+        self.valueTransformers[transformerName] = transformer
+        return self
+    }
+    
+    public func defaultValueTransformer() -> ValueTransformer<T> {
+        return SimpleValueTransformer<T>()
+    }
     
     public override init(value:[T]?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
-        super.init(name: name, priority: priority)
+        super.init(name: name, priority: priority, key:key)
         self.value = value
+        self.valueTransformers = [DefaultValueTransformerKey: self.defaultValueTransformer()]
     }
     
     public func appendValue(value:T) {
@@ -286,10 +366,19 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
             self.value?.removeAtIndex(index)
         }
     }
+    
+    // MARK: - Dictionary values
+    
+    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+        if let dictionaryValues = dictionary[name] as? [AnyObject] {
+            self.value = dictionaryValues.map { self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.importValue($0) }.flatMap { $0 }
+        }
+    }
+    
+    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+        if let value = self.value {
+            dictionary[name] = value.map { self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue($0) }.flatMap { $0 }
+        }
+    }
+    
 }
-
-//
-//
-//public protocol ListableEnum: Equatable {
-//    var allValues:[Any] { get }
-//}

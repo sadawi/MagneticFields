@@ -38,7 +38,7 @@ public class Observation<T> {
     }
     
     class func keyForObserver(observer:FieldObserver?) -> Int {
-        return ObjectIdentifier(observer ?? defaultObserverKey).hashValue
+        return ObjectIdentifier(observer ?? DefaultObserverKey).hashValue
     }
     
     var key: Int {

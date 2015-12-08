@@ -13,6 +13,7 @@ import MagneticFields
 
 class Entity {
     let name = Field<String>()
+    let size = Field<Int>()
 }
 
 class View:FieldObserver {
@@ -182,6 +183,35 @@ class FieldTests: XCTestCase {
         
         XCTAssertGreaterThan(a.name.updatedAt!.timeIntervalSince1970, b.name.updatedAt!.timeIntervalSince1970)
         XCTAssertGreaterThan(b.name.changedAt!.timeIntervalSince1970, a.name.changedAt!.timeIntervalSince1970)
+    }
+    
+    func testExport() {
+        let a = Entity()
+        a.name.value = "Bob"
+
+        var dict:[String:AnyObject] = [:]
+        a.name.writeToDictionary(&dict, name: "name")
+        
+        XCTAssertEqual(dict["name"] as? String, "Bob")
+        
+        dict["size"] = 100
+        a.size.readFromDictionary(dict, name: "size")
+        XCTAssertEqual(a.size.value, 100)
+    }
+    
+    func testCustomTransformers() {
+        let a = Entity()
+        a.size.value = 100
+        
+        a.size.transform("stringify", importValue: { $0 as? Int },
+            exportValue: { $0 == nil ? nil : String($0!) })
+        var dict:[String:AnyObject] = [:]
+        
+        a.size.writeToDictionary(&dict, name: "size")
+        XCTAssertNil(dict["size"] as? String)
+
+        a.size.writeToDictionary(&dict, name: "size", valueTransformer: "stringify")
+        XCTAssertEqual(dict["size"] as? String, "100")
     }
     
 //    func testChaining() {
