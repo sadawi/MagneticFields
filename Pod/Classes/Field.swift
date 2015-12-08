@@ -42,11 +42,11 @@ public protocol FieldType:AnyObject {
     func resetValidationState()
     func validate() -> ValidationState
     
-    func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?)
-    func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?)
+    func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String)
+    func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String)
 
-//    func readFromDictionary(dictionary:[String:AnyObject], name: String)
-//    func writeToDictionary(inout dictionary:[String:AnyObject], name: String)
+    func readFromDictionary(dictionary:[String:AnyObject], name: String)
+    func writeToDictionary(inout dictionary:[String:AnyObject], name: String)
 }
 
 public protocol FieldObserver:AnyObject {
@@ -248,17 +248,30 @@ public class BaseField<T>: FieldType, FieldObserver {
     }
     
     // MARK: - Dictionary values
-    
-    /**
-    Given a dictionary of many values, extracts the relevant ones for this field and updates self.
-    */
-    public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+
+    public func readFromDictionary(dictionary:[String:AnyObject], name: String) {
+        self.readFromDictionary(dictionary, name: name, valueTransformer: DefaultValueTransformerKey)
     }
     
     /**
     Adds data needed to reconstruct self to a dictionary containing many values.
     */
-    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String) {
+        dictionary[name] = nil
+        self.writeToDictionary(&dictionary, name: name, valueTransformer: DefaultValueTransformerKey)
+    }
+
+    
+    /**
+    Given a dictionary of many values, extracts the relevant ones for this field and updates self.
+    */
+    public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String) {
+    }
+    
+    /**
+    Adds data needed to reconstruct self to a dictionary containing many values.
+    */
+    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String) {
         dictionary[name] = nil
     }
     
@@ -272,8 +285,8 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         self.valueTransformers = [DefaultValueTransformerKey: self.defaultValueTransformer()]
     }
     
-    public func transform(transformerName:String, transformer:ValueTransformer<T>) -> Self {
-        self.valueTransformers[transformerName] = transformer
+    public func transform(transformer:ValueTransformer<T>, name transformerName:String?=nil) -> Self {
+        self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = transformer
         return self
     }
     
@@ -284,7 +297,7 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     - parameter importValue: A closure mapping an external value (e.g., a string) to a value for this field.
     - parameter exportValue: A closure mapping a field value to an external value
     */
-    public func transform(transformerName: String?=nil, importValue:(AnyObject? -> T?), exportValue:(T? -> AnyObject?)) -> Self {
+    public func transform(importValue importValue:(AnyObject? -> T?), exportValue:(T? -> AnyObject?), name transformerName: String?=nil) -> Self {
         
         self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = ValueTransformer(importAction: importValue, exportAction: exportValue)
         return self
