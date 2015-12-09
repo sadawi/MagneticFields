@@ -317,13 +317,13 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     
     // MARK: - Dictionary values
     
-    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
         if let dictionaryValue = dictionary[name] {
             self.value = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.importValue(dictionaryValue)
         }
     }
     
-    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
         dictionary[name] = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue(self.value)
     }
     
@@ -353,8 +353,8 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         }
     }
 
-    public func transform(transformerName:String, transformer:ValueTransformer<T>) -> Self {
-        self.valueTransformers[transformerName] = transformer
+    public func transform(transformer:ValueTransformer<T>, name transformerName:String? = nil) -> Self {
+        self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = transformer
         return self
     }
     
@@ -382,13 +382,13 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
     
     // MARK: - Dictionary values
     
-    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
         if let dictionaryValues = dictionary[name] as? [AnyObject] {
             self.value = dictionaryValues.map { self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.importValue($0) }.flatMap { $0 }
         }
     }
     
-    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String? = nil) {
+    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
         if let value = self.value {
             dictionary[name] = value.map { self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue($0) }.flatMap { $0 }
         }
