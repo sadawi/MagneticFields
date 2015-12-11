@@ -11,9 +11,16 @@ import UIKit
 import XCTest
 import MagneticFields
 
+enum Color: String {
+    case Red = "red"
+    case Blue = "blue"
+}
+
 class Entity {
     let name = Field<String>()
     let size = Field<Int>()
+    
+    let color = EnumField<Color>()
 }
 
 class View:FieldObserver {
@@ -40,6 +47,24 @@ class FieldTests: XCTestCase {
     
     func testNothing() {
         XCTAssert(true)
+    }
+    
+    func testEnums() {
+        let entity = Entity()
+        entity.color.value = .Blue
+
+        var dict:[String:AnyObject] = [:]
+        
+        entity.color.writeToDictionary(&dict, name: "color")
+        XCTAssertEqual(dict["color"] as? String, "blue")
+        
+        dict["color"] = "blue"
+        entity.color.readFromDictionary(dict, name: "color")
+        XCTAssertEqual(entity.color.value, Color.Blue)
+
+        dict["color"] = "yellow"
+        entity.color.readFromDictionary(dict, name: "color")
+        XCTAssertNil(entity.color.value)
     }
 
     func testStates() {

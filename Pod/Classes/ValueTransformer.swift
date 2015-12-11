@@ -12,9 +12,9 @@ public protocol ValueTransformerType {
 }
 
 /**
-A strongly typed transformer between AnyObject and a particular type.
-The default implementation does nothing (i.e., everything is mapped to nil).
-*/
+ A strongly typed transformer between AnyObject and a particular type.
+ The default implementation does nothing (i.e., everything is mapped to nil).
+ */
 public class ValueTransformer<T>: ValueTransformerType {
     public typealias ImportActionType = (AnyObject? -> T?)
     public typealias ExportActionType = (T? -> AnyObject?)
@@ -22,11 +22,15 @@ public class ValueTransformer<T>: ValueTransformerType {
     var importAction: ImportActionType?
     var exportAction: ExportActionType?
     
+    public init() {
+        
+    }
+    
     public init(importAction:ImportActionType, exportAction:ExportActionType) {
         self.importAction = importAction
         self.exportAction = exportAction
     }
-
+    
     
     public func importValue(value:AnyObject?) -> T? {
         return self.importAction?(value)
@@ -38,11 +42,11 @@ public class ValueTransformer<T>: ValueTransformerType {
 }
 
 /**
-The simplest working implementation of a transformer: just attempts to cast between T and AnyObject
-*/
+ The simplest working implementation of a transformer: just attempts to cast between T and AnyObject
+ */
 public class SimpleValueTransformer<T>: ValueTransformer<T> {
     
-    public init() {
+    public override init() {
         super.init(importAction: { $0 as? T }, exportAction: { $0 as? AnyObject } )
     }
 }
