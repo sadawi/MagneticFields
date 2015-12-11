@@ -109,8 +109,19 @@ public class BaseField<T>: FieldType, FieldObserver {
         self.state = .Set
         self.validationState = .Unknown
         self.updatedAt = NSDate()
+        self.valueUpdatedHandler?(newValue)
     }
     
+    
+    // MARK: -
+    
+    private var valueUpdatedHandler:(T? -> Void)?
+    
+    public func valueUpdated(handler: (T? -> Void)) -> Self {
+        self.valueUpdatedHandler = handler
+        return self
+    }
+
     
     public var changedAt:NSDate?
     public var updatedAt:NSDate?
@@ -370,18 +381,7 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
     
     public override var value:[T]? {
         didSet {
-            self.state = .Set
-            var changed = false
-            if oldValue != nil && self.value != nil {
-                changed = oldValue! != self.value!
-            } else if oldValue == nil && self.value == nil {
-                changed = false
-            } else {
-                changed = true
-            }
-            if changed {
-                self.valueChanged()
-            }
+            self.valueUpdated(oldValue: oldValue, newValue: self.value)
         }
     }
     
