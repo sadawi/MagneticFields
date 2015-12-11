@@ -33,6 +33,24 @@ class Person {
 person.age.value = 10
 ```
 
+## Field types
+
+The basic field type is `Field`, a generic class whose type parameter is its value type.  For multivalued fields, there is `ArrayField`, which wraps another field that describes the single-valued type.  
+
+```swift
+let tag = Field<String>(name: "Tag")
+let tags = ArrayField(Field<String>(), name: "Tag")
+```
+
+The inner field is responsible for validations, transformations, etc..  The `ArrayField` owns top-level attributes like `name`, `key`, etc. -- but for convenience, it will copy them from the inner field at initialization.
+
+The unary prefix operator `*` is provided to wrap a `Field` in an `ArrayField`.  So you can also write the above declaration like this:
+
+```swift
+let tags = *Field<String>(name: "Tag")
+```
+
+
 ## Validations
 
 Simple closure validations:
@@ -141,20 +159,3 @@ public enum LoadState {
 All fields are initially in the `.NotSet` state, but automatically become `.Set` when their value is set to anything.
 
 The `.Loading` state can be useful when the process of loading takes time.  You might decide to show a spinner in the UI while making an API request, for example.
-
-## Field types
-
-The basic field type is `Field`, a generic class whose type parameter is its value type.  For multivalued fields, there is `ArrayField`, which wraps another field that describes the single-valued type.  
-
-```swift
-let tag = Field<String>(name: "Tag")
-let tags = ArrayField(Field<String>(), name: "Tag")
-```
-
-The inner field is responsible for validations, transformations, etc..  The `ArrayField` owns top-level attributes like `name`, `key`, etc. -- but for convenience, it will copy them from the inner field at initialization.
-
-The unary prefix operator `*` is provided to wrap a `Field` in an `ArrayField`.  So you can also write the above declaration like this:
-
-```swift
-let tags = *Field<String>(name: "Tag")
-```
