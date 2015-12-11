@@ -350,15 +350,15 @@ public prefix func *<T>(right:Field<T>) -> ArrayField<T> {
  
  A multi-valued field.  It's a wrapper for a single-valued field that will handle transformations and validation for individual values.
  
- Attributes that pertain to the top-level array value (e.g., field name, key, etc.) do live in the ArrayField and can be initialized there, 
+ Attributes that pertain to the top-level array value (e.g., field name, key, etc.) do properly belong to the ArrayField object and can be initialized there,
  but they will default to any values specified in the inner field.
  
  For example, if we defined a field like:
     let tag = Field<String>(name: "Tag")
  
- then the equivalent ArrayField declaration could be either
+ then the equivalent ArrayField declaration could be any of these:
     let tags = ArrayField(Field<String>(), name: "Tags")
- or
+    let tags = ArrayField(Field<String>(name: "Tags"))
     let tags = *Field<String>(name: "Tags")
  
  */
