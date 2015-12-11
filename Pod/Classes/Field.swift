@@ -37,6 +37,7 @@ public protocol FieldType:AnyObject {
     var priority: Int { get set }
     var key: String? { get set }
     var validationState:ValidationState { get }
+    var state:LoadState { get }
     
     func addValidationError(message:String)
     func resetValidationState()
