@@ -1,3 +1,7 @@
+[![Version](https://img.shields.io/cocoapods/v/MagneticFields.svg?style=flat)](http://cocoapods.org/pods/MagneticFields)
+[![License](https://img.shields.io/cocoapods/l/MagneticFields.svg?style=flat)](http://cocoapods.org/pods/MagneticFields)
+[![Platform](https://img.shields.io/cocoapods/p/MagneticFields.svg?style=flat)](http://cocoapods.org/pods/MagneticFields)
+
 # MagneticFields
 
 **WARNING: This library is pre-alpha.  I wouldn't recommend using it yet.**
@@ -28,6 +32,24 @@ class Person {
 }
 person.age.value = 10
 ```
+
+## Field types
+
+The basic field type is `Field`, a generic class whose type parameter is its value type.  For multivalued fields, there is `ArrayField`, which wraps another field that describes the single-valued type.  
+
+```swift
+let tag = Field<String>(name: "Tag")
+let tags = ArrayField(Field<String>(), name: "Tag")
+```
+
+The inner field is responsible for validations, transformations, etc..  The `ArrayField` owns top-level attributes like `name`, `key`, etc. -- but for convenience, it will copy them from the inner field at initialization.
+
+The unary prefix operator `*` is provided to wrap a `Field` in an `ArrayField`.  So you can also write the above declaration like this:
+
+```swift
+let tags = *Field<String>(name: "Tag")
+```
+
 
 ## Validations
 
