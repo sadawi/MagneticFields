@@ -12,17 +12,18 @@ public typealias ObservationKey = Int
 
 public class Observation<T> {
     public typealias ObservationAction = (T? -> Void)
+    public typealias ObserverType = AnyObject
     
     typealias ChainableObservationAction = (T? -> T?)
     
-    var observer:Observer?
+    var observer:ObserverType?
     
     var action:ObservationAction?
     var chainableAction:ChainableObservationAction?
     
     var nextObservation:Observation<T>?
    
-    public init(observer:Observer?, action:ObservationAction?) {
+    public init(observer:ObserverType?, action:ObservationAction?) {
         self.observer = observer
         self.action = action
     }
@@ -32,7 +33,7 @@ public class Observation<T> {
         if let action = action {
             action(observable?.observableValue)
         } else if let observer = self.observer {
-            observer.observableValueChanged(observable?.observableValue, observable: observable)
+//            observer.observableValueChanged(observable?.observableValue, observable: observable)
         }
         
 //        if let chainableAction = chainableAction {
@@ -47,7 +48,7 @@ public class Observation<T> {
 //        }
     }
     
-    class func keyForObserver(observer:Observer?) -> ObservationKey {
+    class func keyForObserver(observer:ObserverType?) -> ObservationKey {
         return ObjectIdentifier(observer ?? DefaultObserverKey).hashValue
     }
     

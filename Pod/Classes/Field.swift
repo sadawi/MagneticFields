@@ -259,10 +259,8 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     // MARK: - Observer protocol methods
     
-    public func observableValueChanged<ObservableType:Observable>(value:Any?, observable:ObservableType?) {
-        if let value = value as? T {
-            self.value = value
-        }
+    public func observableValueChanged<ObservableType:Observable>(value:T?, observable:ObservableType?) {
+        self.value = value
     }
     
     // MARK: - Dictionary values
