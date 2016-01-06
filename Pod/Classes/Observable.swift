@@ -18,65 +18,57 @@ import Foundation
 public protocol Observable: class {
     typealias ValueType
     var observableValue: ValueType? { get set }
-    var observations:[ObservationKey:Observation<ValueType>] { get set }
+    var observations: ObservationRegistry<ValueType> { get }
 }
 
 public extension Observable {
     public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?) -> Observation<ValueType> {
-        return self.addObserver(observer, action: nil)
+        let observation = Observation<ValueType> { (value:ValueType?) -> Void in
+            observer?.observableValueChanged(value, observable:self)
+        }
+        self.callObservation(observation)
+        self.observations.set(observer, observation)
+        return observation
     }
     
     public func addObserver(action action:(ValueType? -> Void)?) -> Observation<ValueType> {
-        let observation = Observation<ValueType>(observer:nil, action:action)
-        self.observations[observation.key] = observation
+        let observation = Observation<ValueType>(action: action)
+        self.observations.setNil(observation) // TODO
         self.callObservation(observation)
         return observation
-//        return self.addObserver(nil, action: action)
     }
 
     public func notifyObservers() {
-        for (_, observation) in self.observations {
+        self.observations.each { observation in
             self.callObservation(observation)
         }
     }
     
     public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?, action:(ValueType? -> Void)?) -> Observation<ValueType> {
-        let observation = Observation<ValueType>(observer:observer, action:action)
-        self.observations[observation.key] = observation
+        let observation = Observation<ValueType>(action:action)
+        self.observations.set(observer, observation)
         self.callObservation(observation)
         return observation
     }
     
     private func callObservation(observation:Observation<ValueType>) {
-//        observation.call(value:self.observableValue, observable:self)
         if let action = observation.action {
             action(self.observableValue)
-        } else if let observer = observation.observer {
-//            observer.observableValueChanged(self.observableValue, observable: self)
         }
     }
 
-    private func xcallObservation<U:Observer where U.ValueType == ValueType>(observation:Observation<ValueType>) {
-        //        observation.call(value:self.observableValue, observable:self)
-        if let action = observation.action {
-            action(self.observableValue)
-        } else if let observer = observation.observer as? U {
-            observer.observableValueChanged(self.observableValue, observable: self)
-        }
-    }
-    
     /**
      Unregisters all observers and closures.
      */
     public func removeAllObservers() {
-        self.observations = [:]
+        self.observations.clear()
     }
     
     /**
      Unregisters an observer
      */
     public func removeObserver<U:Observer where U.ValueType==ValueType>(observer:U) {
-        self.observations[Observation<ValueType>.keyForObserver(observer)] = nil
+        self.observations.remove(observer)
     }
 }
 

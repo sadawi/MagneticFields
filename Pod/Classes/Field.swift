@@ -226,7 +226,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     // MARK: - Observation
     
-    public var observations:[Int:Observation<T>] = [:]
+    public var observations = ObservationRegistry<T>()
     
     /**
      Registers a value change observer, which can either be an Observer object or a closure.

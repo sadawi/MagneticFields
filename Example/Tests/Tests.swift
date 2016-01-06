@@ -26,10 +26,8 @@ class Entity {
 class View:Observer {
     var value:String?
     
-    func observableValueChanged<O:Observable>(value:Any?, observable: O?) {
-        if let value = value as? String {
-            self.value = value
-        }
+    func observableValueChanged<ObservableType:Observable>(value:String?, observable: ObservableType?) {
+        self.value = value
     }
 }
 
@@ -51,7 +49,7 @@ class Person: Observable {
         }
     }
     
-    var observations:[Int:Observation<ValueType>] = [:]
+    var observations = ObservationRegistry<String>()
 }
 
 class FieldTests: XCTestCase {
@@ -265,7 +263,7 @@ class FieldTests: XCTestCase {
         let intField = Field<Int>()
         
         // This should not compile:
-        // object --> intField
+//         object --> intField
     }
     
     func testCustomTransformers() {
