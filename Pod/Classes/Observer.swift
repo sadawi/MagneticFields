@@ -9,5 +9,5 @@
 import Foundation
 
 public protocol Observer:AnyObject {
-    func observableValueChanged<O:Observable>(value:Any?, observable:O?)
+    func observableValueChanged<ObservableType:Observable>(value:Any?, observable:ObservableType?)
 }
