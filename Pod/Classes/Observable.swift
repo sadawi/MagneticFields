@@ -36,6 +36,11 @@ public extension Observable {
         return observation
     }
     
+    /**
+     Registers a value change action.
+     
+     - parameter action: A closure to be run when the value changes
+     */
     public func addObserver(action action:(ValueType? -> Void)?) -> Observation<ValueType> {
         let observation = Observation<ValueType>(action: action)
         self.observations.setNil(observation) // TODO
@@ -43,17 +48,23 @@ public extension Observable {
         return observation
     }
 
-    public func notifyObservers() {
-        self.observations.each { observation in
-            self.callObservation(observation)
-        }
-    }
-    
+    /**
+     Registers a value change action associated with an observer.  Instead of calling the observer's delegate method, the action will be run.
+     
+     - parameter observer: an Observer object
+     - parameter action: A closure to be run when the value changes
+     */
     public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?, action:(ValueType? -> Void)?) -> Observation<ValueType> {
         let observation = Observation<ValueType>(action:action)
         self.observations.set(observer, observation)
         self.callObservation(observation)
         return observation
+    }
+    
+    public func notifyObservers() {
+        self.observations.each { observation in
+            self.callObservation(observation)
+        }
     }
     
     private func callObservation(observation:Observation<ValueType>) {
