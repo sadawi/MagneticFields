@@ -12,6 +12,7 @@ public typealias ObservationKey = Int
 
 public class Observation<T> {
     public typealias ObservationAction = (T? -> Void)
+    
     typealias ChainableObservationAction = (T? -> T?)
     
     var observer:Observer?

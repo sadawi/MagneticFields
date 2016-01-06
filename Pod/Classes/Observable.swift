@@ -22,12 +22,16 @@ public protocol Observable: class {
 }
 
 public extension Observable {
-    public func addObserver(observer:Observer?) -> Observation<ValueType> {
+    public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?) -> Observation<ValueType> {
         return self.addObserver(observer, action: nil)
     }
     
     public func addObserver(action action:(ValueType? -> Void)?) -> Observation<ValueType> {
-        return self.addObserver(nil, action: action)
+        let observation = Observation<ValueType>(observer:nil, action:action)
+        self.observations[observation.key] = observation
+        observation.call(value:self.observableValue, observable:self)
+        return observation
+//        return self.addObserver(nil, action: action)
     }
 
     public func notifyObservers() {
@@ -36,7 +40,7 @@ public extension Observable {
         }
     }
     
-    public func addObserver(observer:Observer?, action:(ValueType? -> Void)?) -> Observation<ValueType> {
+    public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?, action:(ValueType? -> Void)?) -> Observation<ValueType> {
         let observation = Observation<ValueType>(observer:observer, action:action)
         self.observations[observation.key] = observation
         observation.call(value:self.observableValue, observable:self)
@@ -53,7 +57,7 @@ public extension Observable {
     /**
      Unregisters an observer
      */
-    public func removeObserver(observer:Observer) {
+    public func removeObserver<U:Observer where U.ValueType==ValueType>(observer:U) {
         self.observations[Observation<ValueType>.keyForObserver(observer)] = nil
     }
 }
@@ -63,11 +67,11 @@ infix operator --> { associativity left precedence 95 }
 infix operator -/-> { associativity left precedence 95 }
 infix operator <--> { associativity left precedence 95 }
 
-public func <--<T:Observable>(observer:Observer, observedField:T) {
+public func <--<T:Observable, U:Observer where U.ValueType == T.ValueType>(observer:U, observedField:T) {
     observedField.addObserver(observer)
 }
 
-public func --><T:Observable>(observable:T, observer:Observer) -> Observation<T.ValueType> {
+public func --><T:Observable, U:Observer where U.ValueType == T.ValueType>(observable:T, observer:U) -> Observation<T.ValueType> {
     return observable.addObserver(observer)
 }
 
@@ -75,7 +79,7 @@ public func --><T:Observable>(observable:T, onChange:(T.ValueType? -> Void)) -> 
     return observable.addObserver(action: onChange)
 }
 
-public func -/-><T:Observable>(observable:T, observer:Observer) {
+public func -/-><T:Observable, U:Observer where U.ValueType == T.ValueType>(observable:T, observer:U) {
     observable.removeObserver(observer)
 }
 
