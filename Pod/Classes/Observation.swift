@@ -48,7 +48,7 @@ public class Observation<T> {
         return ObjectIdentifier(observer ?? DefaultObserverKey).hashValue
     }
     
-    var key: Int {
+    public var key: Int {
         return Observation.keyForObserver(self.observer)
     }
 }

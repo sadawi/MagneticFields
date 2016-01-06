@@ -221,9 +221,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     private func valueChanged() {
         self.changedAt = NSDate()
-        for (_, observation) in self.observations {
-            observation.call(value:self.value, observable:self)
-        }
+        self.notifyObservers()
     }
     
     // MARK: - Observation
@@ -237,33 +235,33 @@ public class BaseField<T>: FieldType, Observer, Observable {
      - parameter observer: an Observer object that will receive change notifications
      - parameter action: a closure to handle changes
      */
-    public func addObserver(observer:Observer?, action:(T? -> Void)?) -> Observation<T> {
-        let observation = Observation<T>(observer:observer, action:action)
-        self.observations[observation.key] = observation
-        observation.call(value:self.value, observable:self)
-        return observation
-    }
+//    public func addObserver(observer:Observer?, action:(T? -> Void)?) -> Observation<T> {
+//        let observation = Observation<T>(observer:observer, action:action)
+//        self.observations[observation.key] = observation
+//        observation.call(value:self.value, observable:self)
+//        return observation
+//    }
     
-    /**
-     Unregisters an observer
-     */
-    public func removeObserver(observer:Observer) {
-        self.observations[Observation<T>.keyForObserver(observer)] = nil
-    }
+//    /**
+//     Unregisters an observer
+//     */
+//    public func removeObserver(observer:Observer) {
+//        self.observations[Observation<T>.keyForObserver(observer)] = nil
+//    }
     
     /**
      Unregisters all observers and closures.
      */
-    public func removeAllObservers() {
-        self.observations = [:]
-    }
+//    public func removeAllObservers() {
+//        self.observations = [:]
+//    }
     
     
     // MARK: - Observer protocol methods
     
-    public func observableValueChanged<O:Observable>(value:Any?, observable:O?) {
-        if let observedField = observable as? BaseField<T> {
-            self.value = observedField.value
+    public func observableValueChanged<ObservableType:Observable>(value:Any?, observable:ObservableType?) {
+        if let value = value as? T {
+            self.value = value
         }
     }
     

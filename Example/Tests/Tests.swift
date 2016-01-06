@@ -33,35 +33,26 @@ class View:Observer {
     }
 }
 
-//class Person: Observable {
-//    typealias ValueType = String
-//    
-//    var name: String?
-//    var observableValue: String? {
-//        get {
-//            return self.name
-//        }
-//        set {
-//            self.name = newValue
-//        }
-//    }
-//}
-//
-//class Person: Observable {
-//    typealias ValueType = String
-//    
-//    var observations:[Int:Observation<ValueType>] = [:]
-//    var name: String?
-//
-//    var observableValue:ValueType? {
-//        get {
-//            return self.name
-//        }
-//        set {
-//            self.name = newValue
-//        }
-//    }
-//}
+class Person: Observable {
+    typealias ValueType = String
+    
+    var name: String? {
+        didSet {
+            self.notifyObservers()
+        }
+    }
+    
+    var observableValue: String? {
+        get {
+            return self.name
+        }
+        set {
+            self.name = newValue
+        }
+    }
+    
+    var observations:[Int:Observation<ValueType>] = [:]
+}
 
 class FieldTests: XCTestCase {
 
@@ -258,19 +249,19 @@ class FieldTests: XCTestCase {
         XCTAssertEqual(a.size.value, 100)
     }
     
-//    func testObservable() {
-//        let object = Person()
-//        let field = Field<String>()
-//        
-//        
-//        object.name = "Bob"
-//        XCTAssertNotEqual(object.name, field.value)
-//
-//        object --> field
-//
-//        object.name = "Alice"
-//        XCTAssertEqual(object.name, field.value)
-//    }
+    func testObservable() {
+        let object = Person()
+        let field = Field<String>()
+        
+        
+        object.name = "Bob"
+        XCTAssertNotEqual(object.name, field.value)
+
+        object --> field
+
+        object.name = "Alice"
+        XCTAssertEqual(object.name, field.value)
+    }
     
     func testCustomTransformers() {
         let a = Entity()
