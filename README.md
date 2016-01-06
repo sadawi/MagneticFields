@@ -86,7 +86,7 @@ Fields will automatically have the following timestamps:
 
 ## Observers
 
-A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method.  Observation events are triggered once when the observer is added, and after that whenever a field value is set.
+A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method (`<--` works the same, only with its arguments swapped). Observation events are triggered once when the observer is added, and after that whenever a field value is set.
 
 ### Adding an observer
 
