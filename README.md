@@ -86,11 +86,11 @@ Fields will automatically have the following timestamps:
 
 ## Observers
 
-A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method.  Observation events are triggered once when the observer is added, and after that whenever a field value is set.
+A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method (`<--` works the same, only with its arguments swapped). Observation events are triggered once when the observer is added, and after that whenever a field value is set.
 
 ### Adding an observer
 
-An observer can be added if it implements the `FieldObserver` protocol, which has a `fieldValueChanged(field, value: value)` method.
+An observer can be added if it implements the `Observer` protocol, which has a `valueChanged(observable, value: value)` method.
 
 ```swift
 field --> observer
@@ -114,7 +114,7 @@ age --> { value in
 
 ### Binding a field to another field
 
-`Field` itself implements `FieldObserver`, and the `-->` operator can be used to create a link between two field values.
+`Field` itself implements `Observer`, and the `-->` operator can be used to create a link between two field values.
 
 ```swift
 sourceField --> destinationField
