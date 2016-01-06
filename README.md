@@ -4,8 +4,6 @@
 
 # MagneticFields
 
-**WARNING: This library is pre-alpha.  I wouldn't recommend using it yet.**
-
 ## Overview
 
 MagneticFields is a library for adding fields to your model objects.  It'll give you:
