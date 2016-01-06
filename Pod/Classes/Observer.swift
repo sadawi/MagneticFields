@@ -8,3 +8,6 @@
 
 import Foundation
 
+public protocol Observer:AnyObject {
+    func observableValueChanged<O:Observable>(value:Any?, observable:O?)
+}

@@ -23,33 +23,45 @@ class Entity {
     let color = EnumField<Color>()
 }
 
-class View:FieldObserver {
+class View:Observer {
     var value:String?
     
-    func fieldValueChanged(value:Any?, field: FieldType?) {
+    func observableValueChanged<O:Observable>(value:Any?, observable: O?) {
         if let value = value as? String {
             self.value = value
         }
     }
 }
 
-class Person: Observable {
-    typealias ValueType = String
-    
-    var name: String? {
-        didSet {
-            self.valueWasChanged()
-        }
-    }
-    
-    func valueWasChanged() {
-    }
-    
-    func addObserver(observer: FieldObserver?, action: (ValueType? -> Void)?) -> Observation<ValueType> {
-        return Observation<ValueType>(observer: nil, action: nil)
-        // TODO
-    }
-}
+//class Person: Observable {
+//    typealias ValueType = String
+//    
+//    var name: String?
+//    var observableValue: String? {
+//        get {
+//            return self.name
+//        }
+//        set {
+//            self.name = newValue
+//        }
+//    }
+//}
+//
+//class Person: Observable {
+//    typealias ValueType = String
+//    
+//    var observations:[Int:Observation<ValueType>] = [:]
+//    var name: String?
+//
+//    var observableValue:ValueType? {
+//        get {
+//            return self.name
+//        }
+//        set {
+//            self.name = newValue
+//        }
+//    }
+//}
 
 class FieldTests: XCTestCase {
 
@@ -246,19 +258,19 @@ class FieldTests: XCTestCase {
         XCTAssertEqual(a.size.value, 100)
     }
     
-    func testObservable() {
-        let object = Person()
-        let field = Field<String>()
-        
-        
-        object.name = "Bob"
-        XCTAssertNotEqual(object.name, field.value)
-
-        object --> field
-
-        object.name = "Alice"
-        XCTAssertEqual(object.name, field.value)
-    }
+//    func testObservable() {
+//        let object = Person()
+//        let field = Field<String>()
+//        
+//        
+//        object.name = "Bob"
+//        XCTAssertNotEqual(object.name, field.value)
+//
+//        object --> field
+//
+//        object.name = "Alice"
+//        XCTAssertEqual(object.name, field.value)
+//    }
     
     func testCustomTransformers() {
         let a = Entity()

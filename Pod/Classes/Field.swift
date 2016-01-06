@@ -50,15 +50,22 @@ public protocol FieldType:AnyObject {
     func writeToDictionary(inout dictionary:[String:AnyObject], name: String)
 }
 
-public protocol FieldObserver:AnyObject {
-    func fieldValueChanged(value:Any?, field:FieldType?)
-}
 
 let DefaultObserverKey:NSString = "____"
 let DefaultValueTransformerKey = "default"
 
-public class BaseField<T>: FieldType, FieldObserver, Observable {
+public class BaseField<T>: FieldType, Observer, Observable {
     public typealias ValueType = T
+    
+    // Maybe move this protocol to the two subclasses below?
+    public var observableValue:T? {
+        get {
+            return nil
+        }
+        set {
+            // nothing
+        }
+    }
     
     public var valueType:Any.Type {
         return T.self
@@ -215,7 +222,7 @@ public class BaseField<T>: FieldType, FieldObserver, Observable {
     private func valueChanged() {
         self.changedAt = NSDate()
         for (_, observation) in self.observations {
-            observation.call(value:self.value, field:self)
+            observation.call(value:self.value, observable:self)
         }
     }
     
@@ -224,23 +231,23 @@ public class BaseField<T>: FieldType, FieldObserver, Observable {
     public var observations:[Int:Observation<T>] = [:]
     
     /**
-     Registers a value change observer, which can either be a FieldObserver object or a closure.
+     Registers a value change observer, which can either be an Observer object or a closure.
      Registering an observerless closure will replace any previous closure.
      
-     - parameter observer: a FieldObserver object that will receive change notifications
+     - parameter observer: an Observer object that will receive change notifications
      - parameter action: a closure to handle changes
      */
-    public func addObserver(observer:FieldObserver?, action:(T? -> Void)?) -> Observation<T> {
+    public func addObserver(observer:Observer?, action:(T? -> Void)?) -> Observation<T> {
         let observation = Observation<T>(observer:observer, action:action)
         self.observations[observation.key] = observation
-        observation.call(value:self.value, field:self)
+        observation.call(value:self.value, observable:self)
         return observation
     }
     
     /**
      Unregisters an observer
      */
-    public func removeObserver(observer:FieldObserver) {
+    public func removeObserver(observer:Observer) {
         self.observations[Observation<T>.keyForObserver(observer)] = nil
     }
     
@@ -252,10 +259,10 @@ public class BaseField<T>: FieldType, FieldObserver, Observable {
     }
     
     
-    // MARK: - FieldObserver protocol methods
+    // MARK: - Observer protocol methods
     
-    public func fieldValueChanged(value:Any?, field:FieldType?) {
-        if let observedField = field as? BaseField<T> {
+    public func observableValueChanged<O:Observable>(value:Any?, observable:O?) {
+        if let observedField = observable as? BaseField<T> {
             self.value = observedField.value
         }
     }
@@ -340,6 +347,19 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         dictionary[name] = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue(self.value)
     }
     
+    // MARK: - Observable
+    
+    public override var observableValue:T? {
+        get {
+            return self.value
+        }
+        set {
+            self.value = newValue
+        }
+    }
+    
+
+    
 }
 
 public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {
@@ -418,5 +438,18 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
             dictionary[name] = value.map { self.field.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue($0) }.flatMap { $0 }
         }
     }
+    
+    // MARK: Observable
+    
+    
+    public override var observableValue:[T]? {
+        get {
+            return self.value
+        }
+        set {
+            self.value = newValue
+        }
+    }
+
     
 }

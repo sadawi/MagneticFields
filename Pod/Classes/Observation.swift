@@ -12,32 +12,39 @@ public class Observation<T> {
     public typealias ObservationAction = (T? -> Void)
     typealias ChainableObservationAction = (T? -> T?)
     
-    var observer:FieldObserver?
+    var observer:Observer?
     
     var action:ObservationAction?
     var chainableAction:ChainableObservationAction?
     
     var nextObservation:Observation<T>?
    
-    public init(observer:FieldObserver?, action:ObservationAction?) {
+    public init(observer:Observer?, action:ObservationAction?) {
         self.observer = observer
         self.action = action
     }
     
-    public func call(value value:T?, field:BaseField<T>?) {
-        if let chainableAction = chainableAction {
-            let result = chainableAction(field?.value)
-            if let nextObservation = nextObservation {
-                nextObservation.call(value: result, field: nil)
-            }
-        } else if let action = action {
-            action(field?.value)
+    public func call<O:Observable where O.ValueType == T>(value value:T?, observable:O?) {
+        // TODO: chainable
+        if let action = action {
+            action(observable?.observableValue)
         } else if let observer = self.observer {
-            observer.fieldValueChanged(field?.value, field: field)
+            observer.observableValueChanged(observable?.observableValue, observable: observable)
         }
+        
+//        if let chainableAction = chainableAction {
+//            let result = chainableAction(observable?.observableValue)
+//            if let nextObservation = nextObservation {
+//                nextObservation.call(value: result, observable: nil)
+//            }
+//        } else if let action = action {
+//            action(observable?.observableValue)
+//        } else if let observer = self.observer {
+//            observer.observableValueChanged(observable?.observableValue, observable: observable)
+//        }
     }
     
-    class func keyForObserver(observer:FieldObserver?) -> Int {
+    class func keyForObserver(observer:Observer?) -> Int {
         return ObjectIdentifier(observer ?? DefaultObserverKey).hashValue
     }
     

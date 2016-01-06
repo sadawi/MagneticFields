@@ -14,7 +14,7 @@ infix operator --> { associativity left precedence 95 }
 infix operator -/-> { associativity left precedence 95 }
 infix operator <--> { associativity left precedence 95 }
 
-public func <--<T>(observer:FieldObserver, observedField:Field<T>) {
+public func <--<T>(observer:Observer, observedField:Field<T>) {
     observedField.addObserver(observer)
 }
 
@@ -22,7 +22,7 @@ public func <--<T>(observer:FieldObserver, observedField:Field<T>) {
 //    return observedField.addObserver(observer)
 //}
 
-public func --><T:Observable>(observable:T, observer:FieldObserver) -> Observation<T.ValueType> {
+public func --><T:Observable>(observable:T, observer:Observer) -> Observation<T.ValueType> {
     return observable.addObserver(observer)
 }
 
@@ -30,7 +30,7 @@ public func --><T>(observedField:Field<T>, onChange:(T? -> Void)) -> Observation
     return observedField.addObserver(action: onChange)
 }
 
-public func -/-><T>(observedField:Field<T>, observer:FieldObserver) {
+public func -/-><T>(observedField:Field<T>, observer:Observer) {
     observedField.removeObserver(observer)
 }
 
