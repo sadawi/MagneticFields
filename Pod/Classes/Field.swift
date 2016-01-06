@@ -57,7 +57,8 @@ public protocol FieldObserver:AnyObject {
 let DefaultObserverKey:NSString = "____"
 let DefaultValueTransformerKey = "default"
 
-public class BaseField<T>: FieldType, FieldObserver {
+public class BaseField<T>: FieldType, FieldObserver, Observable {
+    public typealias ValueType = T
     
     public var valueType:Any.Type {
         return T.self
@@ -220,7 +221,7 @@ public class BaseField<T>: FieldType, FieldObserver {
     
     // MARK: - Observation
     
-    private var observations:[Int:Observation<T>] = [:]
+    public var observations:[Int:Observation<T>] = [:]
     
     /**
      Registers a value change observer, which can either be a FieldObserver object or a closure.
@@ -229,7 +230,7 @@ public class BaseField<T>: FieldType, FieldObserver {
      - parameter observer: a FieldObserver object that will receive change notifications
      - parameter action: a closure to handle changes
      */
-    public func addObserver(observer:FieldObserver?=nil, action:(T? -> Void)?=nil) -> Observation<T> {
+    public func addObserver(observer:FieldObserver?, action:(T? -> Void)?) -> Observation<T> {
         let observation = Observation<T>(observer:observer, action:action)
         self.observations[observation.key] = observation
         observation.call(value:self.value, field:self)

@@ -9,7 +9,7 @@
 import Foundation
 
 public class Observation<T> {
-    typealias ObservationAction = (T? -> Void)
+    public typealias ObservationAction = (T? -> Void)
     typealias ChainableObservationAction = (T? -> T?)
     
     var observer:FieldObserver?
@@ -19,12 +19,12 @@ public class Observation<T> {
     
     var nextObservation:Observation<T>?
    
-    init(observer:FieldObserver?, action:ObservationAction?) {
+    public init(observer:FieldObserver?, action:ObservationAction?) {
         self.observer = observer
         self.action = action
     }
     
-    func call(value value:T?, field:BaseField<T>?) {
+    public func call(value value:T?, field:BaseField<T>?) {
         if let chainableAction = chainableAction {
             let result = chainableAction(field?.value)
             if let nextObservation = nextObservation {

@@ -33,6 +33,24 @@ class View:FieldObserver {
     }
 }
 
+class Person: Observable {
+    typealias ValueType = String
+    
+    var name: String? {
+        didSet {
+            self.valueWasChanged()
+        }
+    }
+    
+    func valueWasChanged() {
+    }
+    
+    func addObserver(observer: FieldObserver?, action: (ValueType? -> Void)?) -> Observation<ValueType> {
+        return Observation<ValueType>(observer: nil, action: nil)
+        // TODO
+    }
+}
+
 class FieldTests: XCTestCase {
 
     override func setUp() {
@@ -226,6 +244,20 @@ class FieldTests: XCTestCase {
         dict["size"] = 100
         a.size.readFromDictionary(dict, name: "size")
         XCTAssertEqual(a.size.value, 100)
+    }
+    
+    func testObservable() {
+        let object = Person()
+        let field = Field<String>()
+        
+        
+        object.name = "Bob"
+        XCTAssertNotEqual(object.name, field.value)
+
+        object --> field
+
+        object.name = "Alice"
+        XCTAssertEqual(object.name, field.value)
     }
     
     func testCustomTransformers() {
