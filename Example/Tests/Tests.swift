@@ -250,6 +250,10 @@ class FieldTests: XCTestCase {
         object.value = "Alice"
         XCTAssertEqual(object.value, field.value)
         
+        object -/-> field
+        object.value = "Phil"
+        XCTAssertNotEqual(object.value, field.value)
+        
         let intField = Field<Int>()
         
         // This should not compile:
