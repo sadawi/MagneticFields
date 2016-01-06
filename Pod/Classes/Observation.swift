@@ -51,8 +51,8 @@ public class ObservationRegistry<V> {
         self.observations[ObservationRegistry.keyForObject(nil)] = observation
     }
 
-    func set<U:Observer where U.ValueType==V>(observer:U?, _ observation:Observation<V>?) {
-        self.observations[ObservationRegistry.keyForObject(observer)] = observation
+    func set(owner:AnyObject, _ observation:Observation<V>?) {
+        self.observations[ObservationRegistry.keyForObject(owner)] = observation
     }
     
     func remove<U:Observer where U.ValueType==V>(observer:U) {

@@ -27,9 +27,9 @@ public extension Observable {
      
      - parameter observer: an Observer object that will receive change notifications
      */
-    public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?) -> Observation<ValueType> {
+    public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U) -> Observation<ValueType> {
         let observation = Observation<ValueType> { (value:ValueType?) -> Void in
-            observer?.valueChanged(value, observable:self)
+            observer.valueChanged(value, observable:self)
         }
         self.callObservation(observation)
         self.observations.set(observer, observation)
@@ -41,7 +41,7 @@ public extension Observable {
      
      - parameter action: A closure to be run when the value changes
      */
-    public func addObserver(action action:(ValueType? -> Void)?) -> Observation<ValueType> {
+    public func addObserver(action action:(ValueType? -> Void)) -> Observation<ValueType> {
         let observation = Observation<ValueType>(action: action)
         self.observations.setNil(observation) // TODO
         self.callObservation(observation)
@@ -49,14 +49,14 @@ public extension Observable {
     }
 
     /**
-     Registers a value change action associated with an observer.  Instead of calling the observer's delegate method, the action will be run.
+     Registers a value change action, along with a generic owner.
      
-     - parameter observer: an Observer object
+     - parameter owner: The observation owner, used only as a key for registering the action
      - parameter action: A closure to be run when the value changes
      */
-    public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?, action:(ValueType? -> Void)?) -> Observation<ValueType> {
+    public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, action:(ValueType? -> Void)) -> Observation<ValueType> {
         let observation = Observation<ValueType>(action:action)
-        self.observations.set(observer, observation)
+        self.observations.set(owner, observation)
         self.callObservation(observation)
         return observation
     }
