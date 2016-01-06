@@ -9,12 +9,16 @@
 import Foundation
 
 /**
- Note: The only reason this is a class protocol is that marking some methods as "mutating" seemed to cause segfaults.
+ An object that has a single observable value and can register observers to be notified when that value changes.
+ 
+ Your class is responsible for calling self.notifyObservers() when appropriate
+ 
+ Note: The only reason this is a class protocol is that marking its methods as "mutating" seemed to cause segfaults!
  */
 public protocol Observable: class {
     typealias ValueType
-    var observations:[ObservationKey:Observation<ValueType>] { get set }
     var observableValue: ValueType? { get set }
+    var observations:[ObservationKey:Observation<ValueType>] { get set }
 }
 
 public extension Observable {
@@ -52,6 +56,32 @@ public extension Observable {
     public func removeObserver(observer:Observer) {
         self.observations[Observation<ValueType>.keyForObserver(observer)] = nil
     }
-
-
 }
+
+infix operator <-- { associativity left precedence 95 }
+infix operator --> { associativity left precedence 95 }
+infix operator -/-> { associativity left precedence 95 }
+infix operator <--> { associativity left precedence 95 }
+
+public func <--<T:Observable>(observer:Observer, observedField:T) {
+    observedField.addObserver(observer)
+}
+
+public func --><T:Observable>(observable:T, observer:Observer) -> Observation<T.ValueType> {
+    return observable.addObserver(observer)
+}
+
+public func --><T:Observable>(observable:T, onChange:(T.ValueType? -> Void)) -> Observation<T.ValueType> {
+    return observable.addObserver(action: onChange)
+}
+
+public func -/-><T:Observable>(observable:T, observer:Observer) {
+    observable.removeObserver(observer)
+}
+
+public func <--><T where T:Observer, T:Observable>(left: T, right: T) {
+    // Order is important!
+    right.addObserver(left)
+    left.addObserver(right)
+}
+
