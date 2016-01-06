@@ -29,7 +29,7 @@ public class Observation<T> {
     public func call<O:Observable where O.ValueType == T>(value value:T?, observable:O?) {
         // TODO: chainable
         if let action = action {
-            action(observable?.observableValue)
+            action(observable?.value)
         }
 //        } else if let observer = self.observer {
 ////            observer.observableValueChanged(observable?.observableValue, observable: observable)

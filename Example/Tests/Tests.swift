@@ -26,7 +26,7 @@ class Entity {
 class View:Observer {
     var value:String?
     
-    func observableValueChanged<ObservableType:Observable>(value:String?, observable: ObservableType?) {
+    func valueChanged<ObservableType:Observable>(value:String?, observable: ObservableType?) {
         self.value = value
     }
 }
@@ -34,21 +34,11 @@ class View:Observer {
 class Person: Observable {
     typealias ValueType = String
     
-    var name: String? {
+    var value: String? {
         didSet {
             self.notifyObservers()
         }
     }
-    
-    var observableValue: String? {
-        get {
-            return self.name
-        }
-        set {
-            self.name = newValue
-        }
-    }
-    
     var observations = ObservationRegistry<String>()
 }
 
@@ -252,13 +242,13 @@ class FieldTests: XCTestCase {
         let field = Field<String>()
         
         
-        object.name = "Bob"
-        XCTAssertNotEqual(object.name, field.value)
+        object.value = "Bob"
+        XCTAssertNotEqual(object.value, field.value)
 
         object --> field
 
-        object.name = "Alice"
-        XCTAssertEqual(object.name, field.value)
+        object.value = "Alice"
+        XCTAssertEqual(object.value, field.value)
         
         let intField = Field<Int>()
         

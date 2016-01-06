@@ -57,16 +57,6 @@ let DefaultValueTransformerKey = "default"
 public class BaseField<T>: FieldType, Observer, Observable {
     public typealias ValueType = T
     
-    // Maybe move this protocol to the two subclasses below?
-    public var observableValue:T? {
-        get {
-            return nil
-        }
-        set {
-            // nothing
-        }
-    }
-    
     public var valueType:Any.Type {
         return T.self
     }
@@ -228,38 +218,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     public var observations = ObservationRegistry<T>()
     
-    /**
-     Registers a value change observer, which can either be an Observer object or a closure.
-     Registering an observerless closure will replace any previous closure.
-     
-     - parameter observer: an Observer object that will receive change notifications
-     - parameter action: a closure to handle changes
-     */
-//    public func addObserver(observer:Observer?, action:(T? -> Void)?) -> Observation<T> {
-//        let observation = Observation<T>(observer:observer, action:action)
-//        self.observations[observation.key] = observation
-//        observation.call(value:self.value, observable:self)
-//        return observation
-//    }
-    
-//    /**
-//     Unregisters an observer
-//     */
-//    public func removeObserver(observer:Observer) {
-//        self.observations[Observation<T>.keyForObserver(observer)] = nil
-//    }
-    
-    /**
-     Unregisters all observers and closures.
-     */
-//    public func removeAllObservers() {
-//        self.observations = [:]
-//    }
-    
-    
-    // MARK: - Observer protocol methods
-    
-    public func observableValueChanged<ObservableType:Observable>(value:T?, observable:ObservableType?) {
+    public func valueChanged<ObservableType:Observable>(value:T?, observable:ObservableType?) {
         self.value = value
     }
     
@@ -343,19 +302,6 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         dictionary[name] = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue(self.value)
     }
     
-    // MARK: - Observable
-    
-    public override var observableValue:T? {
-        get {
-            return self.value
-        }
-        set {
-            self.value = newValue
-        }
-    }
-    
-
-    
 }
 
 public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {
@@ -434,18 +380,5 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
             dictionary[name] = value.map { self.field.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue($0) }.flatMap { $0 }
         }
     }
-    
-    // MARK: Observable
-    
-    
-    public override var observableValue:[T]? {
-        get {
-            return self.value
-        }
-        set {
-            self.value = newValue
-        }
-    }
-
     
 }

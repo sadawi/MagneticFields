@@ -17,14 +17,19 @@ import Foundation
  */
 public protocol Observable: class {
     typealias ValueType
-    var observableValue: ValueType? { get set }
+    var value: ValueType? { get set }
     var observations: ObservationRegistry<ValueType> { get }
 }
 
 public extension Observable {
+    /**
+     Registers a value change observer.
+     
+     - parameter observer: an Observer object that will receive change notifications
+     */
     public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U?) -> Observation<ValueType> {
         let observation = Observation<ValueType> { (value:ValueType?) -> Void in
-            observer?.observableValueChanged(value, observable:self)
+            observer?.valueChanged(value, observable:self)
         }
         self.callObservation(observation)
         self.observations.set(observer, observation)
@@ -53,7 +58,7 @@ public extension Observable {
     
     private func callObservation(observation:Observation<ValueType>) {
         if let action = observation.action {
-            action(self.observableValue)
+            action(self.value)
         }
     }
 
