@@ -261,6 +261,11 @@ class FieldTests: XCTestCase {
 
         object.name = "Alice"
         XCTAssertEqual(object.name, field.value)
+        
+        let intField = Field<Int>()
+        
+        // This should not compile:
+        // object --> intField
     }
     
     func testCustomTransformers() {
