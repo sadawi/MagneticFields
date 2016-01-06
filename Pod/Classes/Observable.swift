@@ -13,7 +13,7 @@ import Foundation
  */
 public protocol Observable: class {
     typealias ValueType
-    var observations:[Int:Observation<ValueType>] { get set }
+    var observations:[ObservationKey:Observation<ValueType>] { get set }
     var observableValue: ValueType? { get set }
 }
 

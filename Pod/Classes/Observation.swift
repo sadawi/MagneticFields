@@ -8,6 +8,8 @@
 
 import Foundation
 
+public typealias ObservationKey = Int
+
 public class Observation<T> {
     public typealias ObservationAction = (T? -> Void)
     typealias ChainableObservationAction = (T? -> T?)
@@ -44,7 +46,7 @@ public class Observation<T> {
 //        }
     }
     
-    class func keyForObserver(observer:Observer?) -> Int {
+    class func keyForObserver(observer:Observer?) -> ObservationKey {
         return ObjectIdentifier(observer ?? DefaultObserverKey).hashValue
     }
     
