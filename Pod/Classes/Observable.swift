@@ -43,7 +43,7 @@ public extension Observable {
     /**
      Registers a value change action.
      
-     - parameter action: A closure to be run when the value changes
+     - parameter onChange: A closure to be run when the value changes
      */
     public func addObserver(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
         let observation = self.createClosureObservation(onChange: onChange)
@@ -55,7 +55,7 @@ public extension Observable {
      Registers a value change action, along with a generic owner.
      
      - parameter owner: The observation owner, used only as a key for registering the action
-     - parameter action: A closure to be run when the value changes
+     - parameter onChange: A closure to be run when the value changes
      */
     public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, onChange:(ValueType? -> Void)) -> Observation<ValueType> {
         let observation = self.createClosureObservation(onChange: onChange)
