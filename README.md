@@ -131,6 +131,18 @@ field1 <--> field2
 
 Since `<--` is called first, both fields will initially have the value of `field2`.
 
+### Type safety
+
+Fields and Observables have a strongly typed `value` property, which must match an Observer's associated type (`ValueType`) or the closure's parameter.
+
+So this will fail to compile:
+
+```swift
+let name = Field<String>()
+let age = Field<Int>()
+name --> age
+```
+
 ### Unregistering
 
 Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()`.
