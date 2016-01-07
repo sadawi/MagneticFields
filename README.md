@@ -86,7 +86,9 @@ Fields will automatically have the following timestamps:
 
 ## Observers
 
-A field can have any number of registered observer objects.  The `-->` operator is a shortcut for the `addObserver` method (`<--` works the same, only with its arguments swapped). Observation events are triggered once when the observer is added, and after that whenever a field value is set.
+This library includes the `Observer` and `Observable` protocols for generic, type-safe change observation.  Fields implement both protocols.
+
+An `Observable` can have any number of registered `Observer` objects.  The `-->` operator is a shortcut for the `addObserver` method (`<--` works the same, only with its arguments swapped). Observation events are triggered once when the observer is added, and after that whenever a field value is set.
 
 ### Adding an observer
 
@@ -96,15 +98,15 @@ An observer can be added if it implements the `Observer` protocol, which has a `
 field --> observer
 ```
 
-Or, if it implements `Hashable`, a closure can be provided.  In this case, the observer is used only to register as the owner of the observation. Only one closure can be associated with each observer.
+Or, a closure can be provided.  In place of an observer object, an `owner` is used only to identify each closure; each owner can only have one associated closure.
 
 ```swift
-field --> observer { value in
+field --> owner { value in
   print(value)
 }
 ```
 
-We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer, and so doing this again will replace the old closure.
+We can still register a closure even if no observer is given.  This is effectively registering the closure with a null observer.  There can only be one of these at a time.
 
 ```swift
 age --> { value in 
@@ -114,7 +116,7 @@ age --> { value in
 
 ### Binding a field to another field
 
-`Field` itself implements `Observer`, and the `-->` operator can be used to create a link between two field values.
+Since `Field` itself implements both `Observable` and `Observer`, the `-->` operator can be used to create a link between two field values.
 
 ```swift
 sourceField --> destinationField
