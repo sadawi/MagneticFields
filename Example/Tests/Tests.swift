@@ -316,12 +316,14 @@ class FieldTests: XCTestCase {
         let a = Entity()
         let b = Entity()
         let c = Entity()
+        let d = Entity()
         
-        a.name --> b.name --> c.name
+        a.name --> b.name --> c.name --> d.name
         a.name.value = "John"
         
         XCTAssertEqual(a.name.value, b.name.value)
         XCTAssertEqual(a.name.value, c.name.value)
+        XCTAssertEqual(a.name.value, d.name.value)
     }
 
     
