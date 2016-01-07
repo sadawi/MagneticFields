@@ -11,10 +11,6 @@ import Foundation
 public class Observation<T> {
     var onChange:(T? -> Void)?
     var getValue:(Void -> T?)?
-    
-//    public func call<ObservableType:Observable where ObservableType.ValueType == T>(value value:T?, observable:ObservableType?) {
-//        self.onChange?(observable?.value)
-//    }
 }
 
 public class ObservationRegistry<V> {
