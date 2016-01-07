@@ -8,7 +8,20 @@
 
 import Foundation
 
-public class Observation<T> {
+public class Observation<T>: Observable {
+    public typealias ValueType = T
+    
+    public var observations = ObservationRegistry<T>()
+    
+    public var value:T? {
+        get {
+            return self.getValue?()
+        }
+        set {
+            self.onChange?(newValue)
+        }
+    }
+    
     var onChange:(T? -> Void)?
     var getValue:(Void -> T?)?
 }
