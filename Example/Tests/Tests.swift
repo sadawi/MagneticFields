@@ -325,28 +325,31 @@ class FieldTests: XCTestCase {
         XCTAssertEqual(a.name.value, c.name.value)
         XCTAssertEqual(a.name.value, d.name.value)
     }
-
     
-////    func testChaining() {
-////        let a = Entity()
+    func testChainingClosureWithSideEffect() {
+        let a = Entity()
+        let b = Entity()
+        
+        var output:String? = nil
+        
+        a.name --> b.name --> { value in
+            output = value
+        }
+        
+        a.name.value = "Joe"
+        XCTAssertEqual("Joe", output)
+    }
+    
+//    func testChainingClosure() {
+//        let a = Entity()
+//        
+//        let observation = ( a.name --> { $0?.uppercaseString } )
+//        a.name.value = "alice"
+//        XCTAssertEqual("ALICE", observation.value)
+//        
 ////        let b = Entity()
-////        let c = Entity()
-////        
-////        var output:String = "testing"
-////
-////        a.name --> b.name --> { output = $0 }
-////        a.name.value = "hello"
-////        XCTAssertEqual(b.name.value, "hello")
-////        XCTAssertEqual(output, "hello")
-////        
-////        a.name --> b.name --> c.name
-////        XCTAssertEqual(c.name.value, "hello")
-////        
+////        a.name --> { $0?.uppercaseString } --> b.name
 ////        a.name.value = "alice"
-////        a.name --> { $0.value?.uppercaseString } --> b.name
 ////        XCTAssertEqual(b.name.value, "ALICE")
-////
-////        a.name.value = "Arnold"
-////        XCTAssertEqual(b.name.value, "ARNOLD")
-////    }
+//    }
 }

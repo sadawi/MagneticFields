@@ -22,13 +22,6 @@ public protocol Observable: class {
 }
 
 public extension Observable {
-    private func didCreateObservation(observation:Observation<ValueType>) {
-        observation.valueChanged(self.value)
-        observation.getValue = { [weak self] in
-            return self?.value
-        }
-    }
-    
     /**
      Registers a value change observer.
      
@@ -39,7 +32,10 @@ public extension Observable {
         observation.onChange = { (value:ValueType?) -> Void in
             observer.valueChanged(value, observable:self)
         }
-        self.didCreateObservation(observation)
+        observation.valueChanged(self.value)
+        observation.getValue = { [weak self] in
+            return self?.value
+        }
         self.observations.set(observer, observation)
         return observation
     }
@@ -50,10 +46,8 @@ public extension Observable {
      - parameter action: A closure to be run when the value changes
      */
     public func addObserver(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
-        let observation = Observation<ValueType>()
-        observation.onChange = onChange
-        self.observations.setNil(observation) // TODO
-        self.didCreateObservation(observation)
+        let observation = self.createClosureObservation(onChange: onChange)
+        self.observations.setNil(observation)
         return observation
     }
 
@@ -64,10 +58,18 @@ public extension Observable {
      - parameter action: A closure to be run when the value changes
      */
     public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+        let observation = self.createClosureObservation(onChange: onChange)
+        self.observations.set(owner, observation)
+        return observation
+    }
+    
+    private func createClosureObservation(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
         let observation = Observation<ValueType>()
         observation.onChange = onChange
-        self.observations.set(owner, observation)
-        self.didCreateObservation(observation)
+        observation.valueChanged(self.value)
+        observation.getValue = { [weak self] in
+            return self?.value
+        }
         return observation
     }
     
