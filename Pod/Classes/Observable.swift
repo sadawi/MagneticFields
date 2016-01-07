@@ -22,6 +22,13 @@ public protocol Observable: class {
 }
 
 public extension Observable {
+    private func didCreateObservation(observation:Observation<ValueType>) {
+        self.callObservation(observation)
+        observation.getValue = { [weak self] in
+            return self?.value
+        }
+    }
+    
     /**
      Registers a value change observer.
      
@@ -32,7 +39,7 @@ public extension Observable {
         observation.onChange = { (value:ValueType?) -> Void in
             observer.valueChanged(value, observable:self)
         }
-        self.callObservation(observation)
+        self.didCreateObservation(observation)
         self.observations.set(observer, observation)
         return observation
     }
@@ -46,7 +53,7 @@ public extension Observable {
         let observation = Observation<ValueType>()
         observation.onChange = onChange
         self.observations.setNil(observation) // TODO
-        self.callObservation(observation)
+        self.didCreateObservation(observation)
         return observation
     }
 
@@ -60,7 +67,7 @@ public extension Observable {
         let observation = Observation<ValueType>()
         observation.onChange = onChange
         self.observations.set(owner, observation)
-        self.callObservation(observation)
+        self.didCreateObservation(observation)
         return observation
     }
     
