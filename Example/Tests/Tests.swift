@@ -240,19 +240,22 @@ class FieldTests: XCTestCase {
     func testObservable() {
         let object = Person()
         let field = Field<String>()
-        
+        let secondField = Field<String>()
         
         object.value = "Bob"
         XCTAssertNotEqual(object.value, field.value)
 
         object --> field
+        object --> secondField
 
         object.value = "Alice"
         XCTAssertEqual(object.value, field.value)
+        XCTAssertEqual(object.value, secondField.value)
         
         object -/-> field
         object.value = "Phil"
         XCTAssertNotEqual(object.value, field.value)
+        XCTAssertEqual(object.value, secondField.value)
         
         let intField = Field<Int>()
         

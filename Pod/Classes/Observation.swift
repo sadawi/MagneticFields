@@ -8,8 +8,6 @@
 
 import Foundation
 
-public typealias ObservationKey = Int
-
 public class Observation<T> {
     public typealias ObservationAction = (T? -> Void)
     
@@ -25,38 +23,38 @@ public class Observation<T> {
 }
 
 public class ObservationRegistry<V> {
-    var observations:[ObservationKey:Observation<V>] = [:]
+    var observations:NSMapTable = NSMapTable.weakToStrongObjectsMapTable()
     
     public init() { }
 
-    class func keyForObject(object:AnyObject?) -> ObservationKey {
-        return ObjectIdentifier(object ?? DefaultObserverKey).hashValue
-    }
-    
     func clear() {
-        self.observations = [:]
+        self.observations.removeAllObjects()
     }
     
     func each(closure:(Observation<V> -> Void)) {
-        for (_, observation) in self.observations {
-            closure(observation)
+        let enumerator = self.observations.objectEnumerator()
+        
+        while let observation = enumerator?.nextObject() {
+            if let observation = observation as? Observation<V> {
+                closure(observation)
+            }
         }
     }
     
     func get<U:Observer where U.ValueType==V>(observer:U?) -> Observation<V>? {
-        return self.observations[ObservationRegistry.keyForObject(observer)]
+        return self.observations.objectForKey(observer) as? Observation<V>
     }
 
     func setNil(observation:Observation<V>?) {
-        self.observations[ObservationRegistry.keyForObject(nil)] = observation
+        self.observations.setObject(observation, forKey: DefaultObserverKey)
     }
 
     func set(owner:AnyObject, _ observation:Observation<V>?) {
-        self.observations[ObservationRegistry.keyForObject(owner)] = observation
+        self.observations.setObject(observation, forKey: owner)
     }
     
     func remove<U:Observer where U.ValueType==V>(observer:U) {
-        self.set(observer, nil)
+        self.observations.removeObjectForKey(observer)
     }
 
 }
