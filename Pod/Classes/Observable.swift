@@ -28,7 +28,8 @@ public extension Observable {
      - parameter observer: an Observer object that will receive change notifications
      */
     public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U) -> Observation<ValueType> {
-        let observation = Observation<ValueType> { (value:ValueType?) -> Void in
+        let observation = Observation<ValueType>()
+        observation.onChange = { (value:ValueType?) -> Void in
             observer.valueChanged(value, observable:self)
         }
         self.callObservation(observation)
@@ -42,7 +43,8 @@ public extension Observable {
      - parameter action: A closure to be run when the value changes
      */
     public func addObserver(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
-        let observation = Observation<ValueType>(onChange: onChange)
+        let observation = Observation<ValueType>()
+        observation.onChange = onChange
         self.observations.setNil(observation) // TODO
         self.callObservation(observation)
         return observation
@@ -55,7 +57,8 @@ public extension Observable {
      - parameter action: A closure to be run when the value changes
      */
     public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, onChange:(ValueType? -> Void)) -> Observation<ValueType> {
-        let observation = Observation<ValueType>(onChange:onChange)
+        let observation = Observation<ValueType>()
+        observation.onChange = onChange
         self.observations.set(owner, observation)
         self.callObservation(observation)
         return observation

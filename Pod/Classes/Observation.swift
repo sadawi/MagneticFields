@@ -12,14 +12,10 @@ public class Observation<T> {
     public typealias ObservationAction = (T? -> Void)
     
     var onChange:ObservationAction?
-   
-    public init(onChange:ObservationAction?) {
-        self.onChange = onChange
-    }
     
-    public func call<ObservableType:Observable where ObservableType.ValueType == T>(value value:T?, observable:ObservableType?) {
-        self.onChange?(observable?.value)
-    }
+//    public func call<ObservableType:Observable where ObservableType.ValueType == T>(value value:T?, observable:ObservableType?) {
+//        self.onChange?(observable?.value)
+//    }
 }
 
 public class ObservationRegistry<V> {
