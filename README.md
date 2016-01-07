@@ -129,14 +129,6 @@ field1 <--> field2
 
 Since `<--` is called first, both fields will initially have the value of `field2`.
 
-### Chaining
-
-The `-->` operator can be chained through any combination of closures and fields.
-
-```swift
-purchase.dollars --> { $0 * 100 } --> purchase.cents --> { print("I spent \($0) cents") }
-```
-
 ### Unregistering
 
 Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()`.
