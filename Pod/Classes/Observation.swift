@@ -9,9 +9,7 @@
 import Foundation
 
 public class Observation<T> {
-    public typealias ObservationAction = (T? -> Void)
-    
-    var onChange:ObservationAction?
+    var onChange:(T? -> Void)?
     
 //    public func call<ObservableType:Observable where ObservableType.ValueType == T>(value value:T?, observable:ObservableType?) {
 //        self.onChange?(observable?.value)
