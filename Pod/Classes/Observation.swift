@@ -11,12 +11,13 @@ import Foundation
 /**
  An object that holds a closure that is to be run when a value changes.
  
- Observations are themselves Observable, which means we can chain them:
-    let a = Field<String>()
-    let b = Field<String>()
-    let c = Field<String>()
- 
-    a --> b --> c
+ `Observation` instances are themselves `Observable`, which means they can be chained:
+ ```
+ let a = Field<String>()
+ let b = Field<String>()
+ let c = Field<String>()
+ a --> b --> c
+ ```
  */
 public class Observation<T>: Observable {
     public typealias ValueType = T

@@ -11,7 +11,7 @@ import Foundation
 /**
  An object that has a single observable value and can register observers to be notified when that value changes.
  
- Your class is responsible for calling self.notifyObservers() when appropriate
+ Your class is responsible for calling `self.notifyObservers()` when appropriate
  
  Note: The only reason this is a class protocol is that marking its methods as "mutating" seemed to cause segfaults!
  */
