@@ -293,6 +293,17 @@ class FieldTests: XCTestCase {
         */
     }
     
+    func testChaining() {
+        let a = Entity()
+        let b = Entity()
+        
+        let observation = (a.name --> b.name)
+        a.name.value = "Wayne"
+        
+        XCTAssertEqual(a.name.value, b.name.value)
+        XCTAssertEqual(a.name.value, observation.value)
+    }
+    
 ////    func testChaining() {
 ////        let a = Entity()
 ////        let b = Entity()
