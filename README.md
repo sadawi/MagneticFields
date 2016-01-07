@@ -13,7 +13,7 @@ MagneticFields is a library for adding fields to your model objects.  It'll give
 * load state
 
 ## Installation
-lin
+
 MagneticFields is available through [CocoaPods](http://cocoapods.org). To install it, add the following line to your Podfile:
 
 ```ruby
