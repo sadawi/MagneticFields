@@ -23,7 +23,7 @@ public protocol Observable: class {
 
 public extension Observable {
     private func didCreateObservation(observation:Observation<ValueType>) {
-        observation.onChange?(self.value)
+        observation.valueChanged(self.value)
         observation.getValue = { [weak self] in
             return self?.value
         }
@@ -73,7 +73,7 @@ public extension Observable {
     
     public func notifyObservers() {
         self.observations.each { observation in
-            observation.onChange?(self.value)
+            observation.valueChanged(self.value)
         }
     }
     

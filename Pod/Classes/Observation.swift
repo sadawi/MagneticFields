@@ -24,6 +24,11 @@ public class Observation<T>: Observable {
     
     var onChange:(T? -> Void)?
     var getValue:(Void -> T?)?
+    
+    public func valueChanged(newValue:T?) {
+        self.onChange?(newValue)
+        self.notifyObservers()
+    }
 }
 
 public class ObservationRegistry<V> {
