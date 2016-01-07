@@ -19,6 +19,7 @@ public class Observation<T>: Observable {
         }
         set {
             self.onChange?(newValue)
+            self.notifyObservers()
         }
     }
     
@@ -26,8 +27,7 @@ public class Observation<T>: Observable {
     var getValue:(Void -> T?)?
     
     public func valueChanged(newValue:T?) {
-        self.onChange?(newValue)
-        self.notifyObservers()
+        self.value = newValue
     }
 }
 
