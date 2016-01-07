@@ -41,8 +41,8 @@ public extension Observable {
      
      - parameter action: A closure to be run when the value changes
      */
-    public func addObserver(action action:(ValueType? -> Void)) -> Observation<ValueType> {
-        let observation = Observation<ValueType>(action: action)
+    public func addObserver(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+        let observation = Observation<ValueType>(onChange: onChange)
         self.observations.setNil(observation) // TODO
         self.callObservation(observation)
         return observation
@@ -54,8 +54,8 @@ public extension Observable {
      - parameter owner: The observation owner, used only as a key for registering the action
      - parameter action: A closure to be run when the value changes
      */
-    public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, action:(ValueType? -> Void)) -> Observation<ValueType> {
-        let observation = Observation<ValueType>(action:action)
+    public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+        let observation = Observation<ValueType>(onChange:onChange)
         self.observations.set(owner, observation)
         self.callObservation(observation)
         return observation
@@ -68,7 +68,7 @@ public extension Observable {
     }
     
     private func callObservation(observation:Observation<ValueType>) {
-        if let action = observation.action {
+        if let action = observation.onChange {
             action(self.value)
         }
     }
@@ -102,7 +102,7 @@ public func --><T:Observable, U:Observer where U.ValueType == T.ValueType>(obser
 }
 
 public func --><T:Observable>(observable:T, onChange:(T.ValueType? -> Void)) -> Observation<T.ValueType> {
-    return observable.addObserver(action: onChange)
+    return observable.addObserver(onChange: onChange)
 }
 
 public func -/-><T:Observable, U:Observer where U.ValueType == T.ValueType>(observable:T, observer:U) {
