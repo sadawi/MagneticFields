@@ -31,7 +31,7 @@ public func ==(lhs:ValidationState, rhs:ValidationState) -> Bool {
 }
 
 public protocol FieldType:AnyObject {
-    var anyObjectValue: AnyObject? { get }
+    var anyObjectValue: AnyObject? { get set }
     var anyValue: Any? { get }
     var valueType:Any.Type { get }
     var name: String? { get set }
@@ -94,6 +94,16 @@ public class BaseField<T>: FieldType, Observer, Observable {
     public var anyObjectValue:AnyObject? {
         get {
             return self.value as? AnyObject
+        }
+        set {
+            // Always set nil if it's passed in
+            if newValue == nil {
+                self.value = nil
+            }
+            // If it's not nil, only set a value if it's the right type
+            if let value = newValue as? T {
+                self.value = value
+            }
         }
     }
     

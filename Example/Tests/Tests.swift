@@ -340,6 +340,24 @@ class FieldTests: XCTestCase {
         XCTAssertEqual("Joe", output)
     }
     
+    func testAnyObjectValue() {
+        let a = Entity()
+        a.name.value = "Bob"
+        XCTAssertEqual(a.name.anyObjectValue as? String, "Bob")
+        
+        a.name.anyObjectValue = "Jane"
+        XCTAssertEqual(a.name.anyObjectValue as? String, "Jane")
+        
+        // Trying to set invalid type has no effect (and does not raise error)
+        a.name.anyObjectValue = 5
+        XCTAssertEqual(a.name.value, "Jane")
+        
+        // But setting nil does work
+        a.name.anyObjectValue = nil
+        XCTAssertNil(a.name.value)
+        
+    }
+    
 //    func testChainingClosure() {
 //        let a = Entity()
 //        
