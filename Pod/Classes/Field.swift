@@ -13,7 +13,7 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     
     public override init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
         super.init(value: value, name: name, priority: priority, key: key)
-        self.valueTransformers = [DefaultValueTransformerKey: self.defaultValueTransformer()]
+        self.setDefaultValueTransformers()
     }
     
     public func transform(transformer:ValueTransformer<T>, name transformerName:String?=nil) -> Self {
@@ -32,6 +32,10 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         
         self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = ValueTransformer(importAction: importValue, exportAction: exportValue)
         return self
+    }
+    
+    public func setDefaultValueTransformers() {
+        self.valueTransformers = [DefaultValueTransformerKey: self.defaultValueTransformer()]
     }
     
     // TODO: don't repeat this.
