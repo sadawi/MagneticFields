@@ -357,6 +357,35 @@ class FieldTests: XCTestCase {
         XCTAssertNil(a.name.value)
         
     }
+}
+
+
+class Label: Equatable {
+    var name: String = "table"
+    init(name: String) { self.name = name }
+}
+func ==(left:Label, right:Label) -> Bool { return left.name == right.name }
+
+class ValueObject {
+    let color = Field<String>(value: "red")
+    let label = Field<Label>(value: Label(name: "shelf"))
+}
+
+
+class ValueFieldTests: XCTestCase {
+    func testInitialValues() {
+        let object = ValueObject()
+        XCTAssertEqual("red", object.color.value)
+        XCTAssertEqual("shelf", object.label.value?.name)
+        XCTAssertEqual(LoadState.Set, object.color.state)
+        
+        let object2 = ValueObject()
+        XCTAssertEqual("shelf", object2.label.value?.name)
+        object2.label.value = Label(name: "table")
+        XCTAssertEqual("shelf", object.label.value?.name)
+        XCTAssertEqual("table", object2.label.value?.name)
+        
+    }
     
 //    func testChainingClosure() {
 //        let a = Entity()

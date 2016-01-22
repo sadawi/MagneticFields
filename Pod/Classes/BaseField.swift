@@ -141,7 +141,12 @@ public class BaseField<T>: FieldType, Observer, Observable {
      Initialize a new field.
      */
     init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
-        self.value = value
+        if let value = value {
+            self.value = value
+            
+            // didSet isn't triggered from init
+            self.state = .Set
+        }
         self.name = name
         self.priority = priority
         self.key = key
