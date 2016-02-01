@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22CB45D71C5EF95D00B3258B /* ArrayFieldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CB45D61C5EF95D00B3258B /* ArrayFieldTests.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -29,6 +30,7 @@
 
 /* Begin PBXFileReference section */
 		17334B07C9876E7A3D3614C5 /* MagneticFields.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = MagneticFields.podspec; path = ../MagneticFields.podspec; sourceTree = "<group>"; };
+		22CB45D61C5EF95D00B3258B /* ArrayFieldTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayFieldTests.swift; sourceTree = "<group>"; };
 		2C7BD6AEF02194E3BE80EE1D /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		36218167CBE8168569501ABA /* Pods_MagneticFields_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MagneticFields_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		560C4651F99599D0187EEA76 /* Pods-MagneticFields_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MagneticFields_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-MagneticFields_Tests/Pods-MagneticFields_Tests.release.xcconfig"; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 			children = (
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
+				22CB45D61C5EF95D00B3258B /* ArrayFieldTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -368,6 +371,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22CB45D71C5EF95D00B3258B /* ArrayFieldTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
