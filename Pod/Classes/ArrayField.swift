@@ -37,7 +37,7 @@ public prefix func *<T>(right:Field<T>) -> ArrayField<T> {
  let tags = *Field<String>(name: "Tags")
  
  */
-public class ArrayField<T:Equatable>: BaseField<[T]> {
+public class ArrayField<T:Hashable>: BaseField<[T]> {
     /**
      A field describing how individual values will be transformed and validated.
      */
@@ -45,6 +45,31 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
     
     public override var value:[T]? {
         didSet {
+            let oldSet:Set<T>
+            let newSet:Set<T>
+            
+            if let oldValue = oldValue {
+                oldSet = Set(oldValue)
+            } else {
+                oldSet = Set()
+            }
+            
+            if let newValue = self.value {
+                newSet = Set(newValue)
+            } else {
+                newSet = Set()
+            }
+            
+            let removed = oldSet.subtract(newSet)
+            let added = newSet.subtract(oldSet)
+            
+            for value in removed {
+                self.valueRemoved(value)
+            }
+            for value in added {
+                self.valueAdded(value)
+            }
+            
             self.valueUpdated(oldValue: oldValue, newValue: self.value)
         }
     }
@@ -56,14 +81,14 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
     }
     
     public func appendValue(value:T) {
-        if self.value?.indexOf(value) == nil {
-            self.value?.append(value)
-        }
+        self.value?.append(value)
+        self.valueAdded(value)
     }
     
     public func removeValue(value:T) {
         if let index = self.value?.indexOf(value) {
             self.value?.removeAtIndex(index)
+            self.valueRemoved(value)
         }
     }
     
@@ -79,6 +104,16 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         if let value = self.value {
             dictionary[name] = value.map { self.field.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue($0) }.flatMap { $0 }
         }
+    }
+    
+    public override func valueUpdated(oldValue oldValue:[T]?, newValue: [T]?) {
+        super.valueUpdated(oldValue: oldValue, newValue: newValue)
+    }
+    
+    public func valueRemoved(value: T) {
+    }
+
+    public func valueAdded(value: T) {
     }
     
 }
