@@ -55,15 +55,22 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         self.value = value
     }
     
-    public func appendValue(value:T) {
-        if self.value?.indexOf(value) == nil {
-            self.value?.append(value)
-        }
+    public func append(value:T) {
+        self.value?.append(value)
+        self.valueAdded(value)
     }
     
-    public func removeValue(value:T) {
+    public func removeFirst(value:T) {
         if let index = self.value?.indexOf(value) {
-            self.value?.removeAtIndex(index)
+            self.removeAtIndex(index)
+        }
+    }
+
+    public func removeAtIndex(index:Int) {
+        let value = self.value?[index]
+        self.value?.removeAtIndex(index)
+        if let value = value {
+            self.valueRemoved(value)
         }
     }
     
@@ -81,4 +88,9 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         }
     }
     
+    public func valueRemoved(value: T) {
+    }
+    
+    public func valueAdded(value: T) {
+    }
 }

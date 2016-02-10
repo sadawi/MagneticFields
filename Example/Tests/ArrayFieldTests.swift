@@ -45,6 +45,16 @@ class ArrayFieldTests: XCTestCase {
         let fido = Pet()
         fido.commands.value?.append("lie down")
         XCTAssertEqual(fido.commands.value?.count, 1)
+        
+        // Make sure duplicates are still added
+        fido.commands.append("lie down")
+        XCTAssertEqual(fido.commands.value?.count, 2)
+        
+        fido.commands.removeAtIndex(0)
+        XCTAssertEqual(fido.commands.value?.count, 1)
+        
+        fido.commands.removeFirst("lie down")
+        XCTAssertEqual(fido.commands.value?.count, 0)
     }
 
 }
