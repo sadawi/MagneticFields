@@ -115,12 +115,13 @@ public class BaseField<T>: FieldType, Observer, Observable {
         }
     }
     
-    public func valueUpdated(oldValue oldValue:T?, newValue: T?) {
+    internal func valueUpdated(oldValue oldValue:T?, newValue: T?) {
         self.state = .Set
         self.validationState = .Unknown
         self.updatedAt = NSDate()
         self.valueUpdatedHandler?(newValue)
     }
+    
     
     // MARK: -
     
