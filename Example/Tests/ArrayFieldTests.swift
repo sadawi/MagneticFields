@@ -10,9 +10,17 @@ import UIKit
 import XCTest
 import MagneticFields
 
+private class Thing: Equatable {
+    var name:String?
+}
+private func ==(left:Thing, right:Thing) -> Bool {
+    return left.name == right.name
+}
+
 private class Pet {
     let name        = Field<String>()
     let commands    = *Field<String>()
+    let things      = *Field<Thing>()
 }
 
 class ArrayFieldTests: XCTestCase {
