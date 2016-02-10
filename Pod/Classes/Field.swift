@@ -43,7 +43,7 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         return SimpleValueTransformer<T>()
     }
     
-    public override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
+    internal override func valueUpdated(oldValue oldValue:T?, newValue: T?) {
         super.valueUpdated(oldValue: oldValue, newValue: newValue)
         if oldValue != self.value {
             self.valueChanged()
