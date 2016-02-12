@@ -14,12 +14,21 @@ private class Entity {
     let size = Field<Int>()
 }
 
-private class View:Observer {
-    var value:String?
+private class View:Observer, Observable {
+    var value:String? {
+        didSet {
+            self.notifyObservers()
+        }
+    }
     
+    // Observer
     func valueChanged<ObservableType:Observable>(value:String?, observable: ObservableType?) {
         self.value = value
     }
+    
+    // Observable
+    typealias ValueType = String
+    var observations = ObservationRegistry<ValueType>()
 }
 
 class ObservationTests: XCTestCase {
@@ -50,6 +59,19 @@ class ObservationTests: XCTestCase {
         entity.name -/-> view
         entity.name.value = "VALUE 3"
         XCTAssertEqual(view.value, "VALUE 2")
+    }
+    
+    func testHeterogeneousBinding() {
+        let a = Entity()
+        let v = View()
+        
+        a.name.value = "Title"
+        v <--> a.name
+        XCTAssertEqual(v.value, "Title")
+        a.name.value = "New Title"
+        XCTAssertEqual(v.value, "New Title")
+        v.value = "New New Title"
+        XCTAssertEqual("New New Title", a.name.value)
     }
     
     func testBinding() {

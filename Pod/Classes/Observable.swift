@@ -11,7 +11,7 @@ import Foundation
 /**
  An object that has a single observable value and can register observers to be notified when that value changes.
  
- Your class is responsible for calling `self.notifyObservers()` when appropriate
+ Your class is responsible for calling `self.notifyObservers()` when appropriate.
  
  Note: The only reason this is a class protocol is that marking its methods as "mutating" seemed to cause segfaults!
  */
@@ -115,7 +115,7 @@ public func -/-><T:Observable, U:Observer where U.ValueType == T.ValueType>(obse
     observable.removeObserver(observer)
 }
 
-public func <--><T where T:Observer, T:Observable>(left: T, right: T) {
+public func <--><T, U where T:Observer, T:Observable, U:Observer, U:Observable, T.ValueType == U.ValueType>(left: T, right: U) {
     // Order is important!
     right.addObserver(left)
     left.addObserver(right)
