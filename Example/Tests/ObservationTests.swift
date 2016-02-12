@@ -14,6 +14,13 @@ private class Entity {
     let size = Field<Int>()
 }
 
+private class View:Observer {
+    var value:String?
+    
+    func valueChanged<ObservableType:Observable>(value:String?, observable: ObservableType?) {
+        self.value = value
+    }
+}
 
 class ObservationTests: XCTestCase {
 

@@ -23,14 +23,6 @@ private class Entity {
     let color = EnumField<Color>()
 }
 
-class View:Observer {
-    var value:String?
-    
-    func valueChanged<ObservableType:Observable>(value:String?, observable: ObservableType?) {
-        self.value = value
-    }
-}
-
 class Person: Observable {
     typealias ValueType = String
     
