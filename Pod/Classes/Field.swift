@@ -50,16 +50,35 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         }
     }
     
+    // MARK: Value transformers
+    
+    public func valueTransformer(key key: String? = nil) -> ValueTransformer<T>? {
+        let key = key ??  DefaultValueTransformerKey
+        return self.valueTransformers[key]
+    }
+    
     // MARK: - Dictionary values
     
-    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
-        if let dictionaryValue = dictionary[name] {
-            self.value = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.importValue(dictionaryValue)
+    public final override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
+        if let transformer = self.valueTransformer(key: valueTransformer) {
+            self.readFromDictionary(dictionary, name: name, valueTransformer: transformer)
         }
     }
     
-    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
-        dictionary[name] = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue(self.value)
+    public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:ValueTransformer<T>) {
+        if let dictionaryValue = dictionary[name] {
+            self.value = valueTransformer.importValue(dictionaryValue)
+        }
+    }
+    
+    public final override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
+        if let transformer = self.valueTransformer(key: valueTransformer) {
+            self.writeToDictionary(&dictionary, name: name, valueTransformer: transformer)
+        }
+    }
+
+    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:ValueTransformer<T>) {
+        dictionary[name] = valueTransformer.exportValue(self.value)
     }
     
 }

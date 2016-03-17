@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import MagneticFields
 
 class TransformerTests: XCTestCase {
 
@@ -19,17 +20,15 @@ class TransformerTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    func testDateTransformer() {
+        let transformer = DateTransformer(dateFormat: "yyyy-MM-dd")
+        let date = NSDate(timeIntervalSince1970: 0)
+        let string = transformer.exportValue(date) as? String
+        XCTAssertEqual("1969-12-31", string)
+        
+        let string2 = "2015-03-03"
+        let date2 = transformer.importValue(string2)
+        XCTAssertNotNil(date2)
     }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
 }

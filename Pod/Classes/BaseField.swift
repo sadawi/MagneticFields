@@ -261,7 +261,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
      */
     public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String) {
     }
-    
+
     /**
      Adds data needed to reconstruct self to a dictionary containing many values.
      */
