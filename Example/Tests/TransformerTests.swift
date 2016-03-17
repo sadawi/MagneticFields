@@ -31,4 +31,17 @@ class TransformerTests: XCTestCase {
         let date2 = transformer.importValue(string2)
         XCTAssertNotNil(date2)
     }
+    
+    func testDefaultTransformers() {
+        let floatField = Field<Float>()
+        
+        let floatDict = ["number": 3.0]
+        floatField.readFromDictionary(floatDict, name: "number")
+        XCTAssertEqual(3.0, floatField.value)
+        
+        let intDict = ["number": 2]
+        floatField.readFromDictionary(intDict, name: "number")
+        XCTAssertEqual(2.0, floatField.value)
+        
+    }
 }
