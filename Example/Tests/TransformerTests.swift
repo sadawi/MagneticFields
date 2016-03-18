@@ -9,6 +9,34 @@
 import XCTest
 import MagneticFields
 
+struct Price: Equatable, ValueTransformable {
+    var value: Float
+    
+    static var valueTransformer: ValueTransformer<Price> {
+        return ValueTransformer<Price>(
+            importAction: { value in
+                var importableValue: Float? = nil
+                if let floatValue = value as? Float {
+                    importableValue = floatValue
+                } else if let intValue = value as? Int {
+                    importableValue = Float(intValue)
+                }
+                
+                if let importableValue = importableValue {
+                    return Price(value: importableValue)
+                } else {
+                    return nil
+                }
+            },
+            exportAction: { price in
+                return price?.value
+        })
+    }
+}
+func ==(a:Price, b:Price) -> Bool {
+    return a.value == b.value
+}
+
 class TransformerTests: XCTestCase {
 
     override func setUp() {
@@ -43,5 +71,13 @@ class TransformerTests: XCTestCase {
         floatField.readFromDictionary(intDict, name: "number")
         XCTAssertEqual(2.0, floatField.value)
         
+        let priceField = AutomaticField<Price>()
+        let transformer = priceField.defaultValueTransformer()
+        let imported = transformer.importValue(0.2)
+        XCTAssertEqual(imported, Price(value: 0.2))
+
+        let priceDict = ["price": 10.0]
+        priceField.readFromDictionary(priceDict, name: "price")
+        XCTAssertEqual(priceField.value?.value, 10.0)
     }
 }
