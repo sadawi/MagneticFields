@@ -13,9 +13,14 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     
     public override init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
         super.init(value: value, name: name, priority: priority, key: key)
-        self.setDefaultValueTransformers()
     }
     
+    /**
+     Sets a ValueTransformer for this field.  An identifier can be provided to distinguish different transformers.
+     
+     - parameter transformer: The ValueTransformer to set
+     - parameter name: An identifier for the transformer.
+     */
     public func transform(transformer:ValueTransformer<T>, name transformerName:String?=nil) -> Self {
         self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = transformer
         return self
@@ -24,7 +29,7 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     /**
      Adds a value transformer (with optional name) for this field.
      
-     - parameter transformerName: A string used to identify this transformer. If omitted, will be the default transformer.
+     - parameter name: A string used to identify this transformer. If omitted, will be the default transformer.
      - parameter importValue: A closure mapping an external value (e.g., a string) to a value for this field.
      - parameter exportValue: A closure mapping a field value to an external value
      */
@@ -32,10 +37,6 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         
         self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = ValueTransformer(importAction: importValue, exportAction: exportValue)
         return self
-    }
-    
-    public func setDefaultValueTransformers() {
-        self.valueTransformers = [DefaultValueTransformerKey: self.defaultValueTransformer()]
     }
     
     // TODO: don't repeat this.
@@ -50,16 +51,32 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
         }
     }
     
+    // MARK: Value transformers
+    
+    public func valueTransformer(name key: String? = nil) -> ValueTransformer<T> {
+        return self.valueTransformers[key ??  DefaultValueTransformerKey] ?? self.defaultValueTransformer()
+    }
+    
     // MARK: - Dictionary values
     
-    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
+    public final override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
+        let transformer = self.valueTransformer(name: valueTransformer)
+        self.readFromDictionary(dictionary, name: name, valueTransformer: transformer)
+    }
+    
+    public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:ValueTransformer<T>) {
         if let dictionaryValue = dictionary[name] {
-            self.value = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.importValue(dictionaryValue)
+            self.value = valueTransformer.importValue(dictionaryValue)
         }
     }
     
-    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
-        dictionary[name] = self.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue(self.value)
+    public final override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
+        let transformer = self.valueTransformer(name: valueTransformer)
+        self.writeToDictionary(&dictionary, name: name, valueTransformer: transformer)
+    }
+
+    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:ValueTransformer<T>) {
+        dictionary[name] = valueTransformer.exportValue(self.value)
     }
     
 }
