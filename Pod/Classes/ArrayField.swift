@@ -78,13 +78,13 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
     
     public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
         if let dictionaryValues = dictionary[name] as? [AnyObject] {
-            self.value = dictionaryValues.map { self.field.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.importValue($0) }.flatMap { $0 }
+            self.value = dictionaryValues.map { self.field.valueTransformer(name: valueTransformer).importValue($0) }.flatMap { $0 }
         }
     }
     
     public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
         if let value = self.value {
-            dictionary[name] = value.map { self.field.valueTransformers[valueTransformer ?? DefaultValueTransformerKey]?.exportValue($0) }.flatMap { $0 }
+            dictionary[name] = value.map { self.field.valueTransformer(name: valueTransformer).exportValue($0) }.flatMap { $0 }
         }
     }
     
