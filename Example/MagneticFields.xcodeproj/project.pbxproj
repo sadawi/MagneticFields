@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		222249EB1CAC2A79006D612B /* CustomFieldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222249EA1CAC2A79006D612B /* CustomFieldTests.swift */; };
 		22470B0A1C73A8B00036447B /* TransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22470B091C73A8B00036447B /* TransformerTests.swift */; };
 		2264B9E41C6E6C7900B609A0 /* ObservationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2264B9E31C6E6C7900B609A0 /* ObservationTests.swift */; };
 		22CB45D71C5EF95D00B3258B /* ArrayFieldTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CB45D61C5EF95D00B3258B /* ArrayFieldTests.swift */; };
@@ -32,6 +33,7 @@
 
 /* Begin PBXFileReference section */
 		17334B07C9876E7A3D3614C5 /* MagneticFields.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = MagneticFields.podspec; path = ../MagneticFields.podspec; sourceTree = "<group>"; };
+		222249EA1CAC2A79006D612B /* CustomFieldTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFieldTests.swift; sourceTree = "<group>"; };
 		22470B091C73A8B00036447B /* TransformerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransformerTests.swift; sourceTree = "<group>"; };
 		2264B9E31C6E6C7900B609A0 /* ObservationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObservationTests.swift; sourceTree = "<group>"; };
 		22CB45D61C5EF95D00B3258B /* ArrayFieldTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayFieldTests.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				22CB45D61C5EF95D00B3258B /* ArrayFieldTests.swift */,
 				2264B9E31C6E6C7900B609A0 /* ObservationTests.swift */,
 				22470B091C73A8B00036447B /* TransformerTests.swift */,
+				222249EA1CAC2A79006D612B /* CustomFieldTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -378,6 +381,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22CB45D71C5EF95D00B3258B /* ArrayFieldTests.swift in Sources */,
+				222249EB1CAC2A79006D612B /* CustomFieldTests.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 				2264B9E41C6E6C7900B609A0 /* ObservationTests.swift in Sources */,
 				22470B0A1C73A8B00036447B /* TransformerTests.swift in Sources */,

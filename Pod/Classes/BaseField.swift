@@ -43,12 +43,16 @@ public protocol FieldType:AnyObject {
     func addValidationError(message:String)
     func resetValidationState()
     func validate() -> ValidationState
-    
-    func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String)
-    func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String)
-    
-    func readFromDictionary(dictionary:[String:AnyObject], name: String)
-    func writeToDictionary(inout dictionary:[String:AnyObject], name: String)
+
+    func readFromDictionary(dictionary:[String:AnyObject])
+    func writeToDictionary(inout dictionary:[String:AnyObject], inout seenFields:[FieldType])
+}
+
+public extension FieldType {
+    public func writeToDictionary(inout dictionary:[String:AnyObject]) {
+        var seenFields:[FieldType] = []
+        self.writeToDictionary(&dictionary, seenFields: &seenFields)
+    }
 }
 
 
@@ -243,30 +247,24 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     // MARK: - Dictionary values
     
-    public func readFromDictionary(dictionary:[String:AnyObject], name: String) {
-        self.readFromDictionary(dictionary, name: name, valueTransformer: DefaultValueTransformerKey)
+    public func readFromDictionary(dictionary:[String:AnyObject]) { }
+    public func writeToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType]) {
+        if let key = self.key {
+            if seenFields.contains({$0 === self}) {
+                self.writeSeenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+            } else {
+                seenFields.append(self)
+                self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+            }
+        }
     }
     
-    /**
-     Adds data needed to reconstruct self to a dictionary containing many values.
-     */
-    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String) {
-        dictionary[name] = nil
-        self.writeToDictionary(&dictionary, name: name, valueTransformer: DefaultValueTransformerKey)
+    public func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+        // Implement in subclass
     }
     
-    
-    /**
-     Given a dictionary of many values, extracts the relevant ones for this field and updates self.
-     */
-    public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String) {
-    }
-
-    /**
-     Adds data needed to reconstruct self to a dictionary containing many values.
-     */
-    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String) {
-        dictionary[name] = nil
+    public func writeSeenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+        // Implement in subclass
     }
     
 }

@@ -59,26 +59,31 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     
     // MARK: - Dictionary values
     
-    public final override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
-        let transformer = self.valueTransformer(name: valueTransformer)
-        self.readFromDictionary(dictionary, name: name, valueTransformer: transformer)
-    }
-    
-    public func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:ValueTransformer<T>) {
-        if let dictionaryValue = dictionary[name] {
-            self.value = valueTransformer.importValue(dictionaryValue)
+    public override func readFromDictionary(dictionary:[String:AnyObject]) {
+        if let key = self.key, let dictionaryValue = dictionary[key] {
+            self.value = self.valueTransformer().importValue(dictionaryValue)
         }
     }
     
-    public final override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
-        let transformer = self.valueTransformer(name: valueTransformer)
-        self.writeToDictionary(&dictionary, name: name, valueTransformer: transformer)
+    public override func writeToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType]) {
+        if let key = self.key {
+            if seenFields.contains({$0 === self}) {
+                self.writeSeenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+            } else {
+                seenFields.append(self)
+                self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+            }
+        }
     }
 
-    public func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:ValueTransformer<T>) {
-        dictionary[name] = valueTransformer.exportValue(self.value)
+    public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+        dictionary[key] = self.valueTransformer().exportValue(self.value)
     }
-    
+
+    public override func writeSeenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+        self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+    }
+
 }
 
 public func ==<T:Equatable>(left: Field<T>, right: Field<T>) -> Bool {

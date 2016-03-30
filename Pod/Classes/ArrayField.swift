@@ -76,17 +76,18 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
     
     // MARK: - Dictionary values
     
-    public override func readFromDictionary(dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
-        if let dictionaryValues = dictionary[name] as? [AnyObject] {
-            self.value = dictionaryValues.map { self.field.valueTransformer(name: valueTransformer).importValue($0) }.flatMap { $0 }
+    public override func readFromDictionary(dictionary:[String:AnyObject]) {
+        if let key = self.key, let dictionaryValues = dictionary[key] as? [AnyObject] {
+            self.value = dictionaryValues.map { self.field.valueTransformer().importValue($0) }.flatMap{$0}
         }
     }
     
-    public override func writeToDictionary(inout dictionary:[String:AnyObject], name: String, valueTransformer:String?) {
-        if let value = self.value {
-            dictionary[name] = value.map { self.field.valueTransformer(name: valueTransformer).exportValue($0) }.flatMap { $0 }
+    public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+        if let key = self.key, let value = self.value {
+            dictionary[key] = value.map { self.field.valueTransformer().exportValue($0) }.flatMap { $0 }
         }
     }
+
     
     public func valueRemoved(value: T) {
     }
