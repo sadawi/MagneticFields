@@ -61,23 +61,23 @@ class TransformerTests: XCTestCase {
     }
     
     func testDefaultTransformers() {
-        let floatField = Field<Float>()
+        let floatField = Field<Float>(key: "number")
         
         let floatDict = ["number": 3.0]
-        floatField.readFromDictionary(floatDict, name: "number")
+        floatField.readFromDictionary(floatDict)
         XCTAssertEqual(3.0, floatField.value)
         
         let intDict = ["number": 2]
-        floatField.readFromDictionary(intDict, name: "number")
+        floatField.readFromDictionary(intDict)
         XCTAssertEqual(2.0, floatField.value)
         
-        let priceField = AutomaticField<Price>()
+        let priceField = AutomaticField<Price>(key: "price")
         let transformer = priceField.defaultValueTransformer()
         let imported = transformer.importValue(0.2)
         XCTAssertEqual(imported, Price(value: 0.2))
 
         let priceDict = ["price": 10.0]
-        priceField.readFromDictionary(priceDict, name: "price")
+        priceField.readFromDictionary(priceDict)
         XCTAssertEqual(priceField.value?.value, 10.0)
     }
 }

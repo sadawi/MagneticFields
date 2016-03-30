@@ -17,10 +17,10 @@ enum Color: String {
 }
 
 private class Entity {
-    let name = Field<String>()
-    let size = Field<Int>()
+    let name = Field<String>(key: "name")
+    let size = Field<Int>(key: "size")
     
-    let color = EnumField<Color>()
+    let color = EnumField<Color>(key: "color")
 }
 
 class Person: Observable {
@@ -56,15 +56,15 @@ class FieldTests: XCTestCase {
 
         var dict:[String:AnyObject] = [:]
         
-        entity.color.writeToDictionary(&dict, name: "color")
+        entity.color.writeToDictionary(&dict)
         XCTAssertEqual(dict["color"] as? String, "blue")
         
         dict["color"] = "blue"
-        entity.color.readFromDictionary(dict, name: "color")
+        entity.color.readFromDictionary(dict)
         XCTAssertEqual(entity.color.value, Color.Blue)
 
         dict["color"] = "yellow"
-        entity.color.readFromDictionary(dict, name: "color")
+        entity.color.readFromDictionary(dict)
         XCTAssertNil(entity.color.value)
     }
 
@@ -148,12 +148,12 @@ class FieldTests: XCTestCase {
         a.name.value = "Bob"
 
         var dict:[String:AnyObject] = [:]
-        a.name.writeToDictionary(&dict, name: "name")
+        a.name.writeToDictionary(&dict)
         
         XCTAssertEqual(dict["name"] as? String, "Bob")
         
         dict["size"] = 100
-        a.size.readFromDictionary(dict, name: "size")
+        a.size.readFromDictionary(dict)
         XCTAssertEqual(a.size.value, 100)
     }
     
@@ -168,7 +168,7 @@ class FieldTests: XCTestCase {
         )
         var dict:[String:AnyObject] = [:]
         
-        a.size.writeToDictionary(&dict, name: "size")
+        a.size.writeToDictionary(&dict)
         XCTAssertNil(dict["size"] as? String)
 
         /** 
