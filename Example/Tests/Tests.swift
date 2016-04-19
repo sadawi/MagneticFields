@@ -204,6 +204,17 @@ class FieldTests: XCTestCase {
         XCTAssertNil(a.name.value)
         
     }
+    
+    func testValidationState() {
+        let state = ValidationState.Valid
+        XCTAssertTrue(state.isValid)
+        XCTAssertFalse(state.isInvalid)
+        
+        let state2 = ValidationState.Invalid(["wrong"])
+        XCTAssertFalse(state2.isValid)
+        XCTAssertTrue(state2.isInvalid)
+    }
+
 }
 
 

@@ -20,6 +20,17 @@ public enum ValidationState:Equatable {
     case Unknown
     case Invalid([String])
     case Valid
+    
+    public var isInvalid: Bool {
+        switch self {
+        case .Invalid: return true
+        default: return false
+        }
+    }
+    
+    public var isValid: Bool {
+        return self == .Valid
+    }
 }
 public func ==(lhs:ValidationState, rhs:ValidationState) -> Bool {
     switch (lhs, rhs) {
