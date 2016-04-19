@@ -16,7 +16,7 @@ import Foundation
  Note: The only reason this is a class protocol is that marking its methods as "mutating" seemed to cause segfaults!
  */
 public protocol Observable: class {
-    typealias ValueType
+    associatedtype ValueType
     var value: ValueType? { get set }
     var observations: ObservationRegistry<ValueType> { get }
 }
