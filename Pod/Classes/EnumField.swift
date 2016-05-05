@@ -15,7 +15,7 @@ import Foundation
  */
 public class EnumValueTransformer<E:RawRepresentable>: ValueTransformer<E> {
     
-    public override init() {
+    public required init() {
         super.init()
     }
     

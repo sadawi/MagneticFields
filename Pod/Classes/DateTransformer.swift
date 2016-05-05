@@ -16,7 +16,7 @@ public class DateTransformer: ValueTransformer<NSDate> {
         return result
     }()
     
-    public override init() {
+    public required init() {
         super.init()
     }
     
