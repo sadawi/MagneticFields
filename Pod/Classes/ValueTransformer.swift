@@ -22,7 +22,7 @@ public class ValueTransformer<T>: ValueTransformerType {
     var importAction: ImportActionType?
     var exportAction: ExportActionType?
     
-    public init() {
+    public required init() {
         
     }
     
@@ -46,7 +46,7 @@ public class ValueTransformer<T>: ValueTransformerType {
  */
 public class SimpleValueTransformer<T>: ValueTransformer<T> {
     
-    public override init() {
+    public required init() {
         super.init(importAction: { $0 as? T }, exportAction: { $0 as? AnyObject } )
     }
 }
