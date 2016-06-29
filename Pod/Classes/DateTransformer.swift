@@ -44,11 +44,11 @@ public class DateTransformer: ValueTransformer<NSDate> {
         }
     }
     
-    override public func exportValue(value:NSDate?) -> AnyObject? {
+    override public func exportValue(value:NSDate?, explicitNull: Bool = false) -> AnyObject? {
         if let value = value {
             return self.dateFormatter.stringFromDate(value)
         } else {
-            return nil
+            return self.nullValue(explicit: explicitNull)
         }
     }
 }

@@ -27,8 +27,8 @@ public class EnumValueTransformer<E:RawRepresentable>: ValueTransformer<E> {
         }
     }
     
-    public override func exportValue(value:E?) -> AnyObject? {
-        return value?.rawValue as? AnyObject
+    public override func exportValue(value:E?, explicitNull: Bool = false) -> AnyObject? {
+        return (value?.rawValue as? AnyObject) ?? self.nullValue(explicit: explicitNull)
     }
 }
 
