@@ -46,7 +46,7 @@ public class ValueTransformer<T>: ValueTransformerType {
         if let value = self.exportAction?(value) {
             return value
         } else {
-            return self.nullValue(explicit: explicitNull)
+            return self.dynamicType.nullValue(explicit: explicitNull)
         }
     }
     
@@ -54,8 +54,15 @@ public class ValueTransformer<T>: ValueTransformerType {
      Generates an external value representing nil.
      - parameter explicit: Whether the value should be a special (non-nil) value.
      */
-    public func nullValue(explicit explicit: Bool = false) -> AnyObject? {
+    public class func nullValue(explicit explicit: Bool = false) -> AnyObject? {
         return explicit ? NSNull() : nil
+    }
+    
+    /**
+     Determine whether an external value represents nil.  By default, this will be true for `nil` and `NSNull` instances.
+     */
+    public class func valueIsNull(value: AnyObject?) -> Bool {
+        return value == nil || value is NSNull
     }
 }
 

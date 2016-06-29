@@ -48,7 +48,7 @@ public class DateTransformer: ValueTransformer<NSDate> {
         if let value = value {
             return self.dateFormatter.stringFromDate(value)
         } else {
-            return self.nullValue(explicit: explicitNull)
+            return self.dynamicType.nullValue(explicit: explicitNull)
         }
     }
 }
