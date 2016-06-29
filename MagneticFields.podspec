@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "MagneticFields"
-  s.version          = "0.6.3"
+  s.version          = "0.6.4"
   s.summary          = "Type-safe model fields with validation and observation"
   s.homepage         = "https://github.com/sadawi/MagneticFields"
   s.license          = 'MIT'

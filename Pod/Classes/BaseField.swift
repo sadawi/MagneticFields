@@ -56,13 +56,14 @@ public protocol FieldType:AnyObject {
     func validate() -> ValidationState
 
     func readFromDictionary(dictionary:[String:AnyObject])
-    func writeToDictionary(inout dictionary:[String:AnyObject], inout seenFields:[FieldType])
+    func writeToDictionary(inout dictionary:[String:AnyObject], inout seenFields:[FieldType], explicitNull: Bool)
 }
 
 public extension FieldType {
-    public func writeToDictionary(inout dictionary:[String:AnyObject]) {
+    /// A version of writeToDictionary with optional params, since that's not possible with just the protocol.
+    public func writeToDictionary(inout dictionary:[String:AnyObject], explicitNull: Bool = false) {
         var seenFields:[FieldType] = []
-        self.writeToDictionary(&dictionary, seenFields: &seenFields)
+        self.writeToDictionary(&dictionary, seenFields: &seenFields, explicitNull: explicitNull)
     }
 }
 
@@ -259,18 +260,18 @@ public class BaseField<T>: FieldType, Observer, Observable {
     // MARK: - Dictionary values
     
     public func readFromDictionary(dictionary:[String:AnyObject]) { }
-    public func writeToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType]) {
+    public func writeToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], explicitNull: Bool = false) {
         if let key = self.key {
             if seenFields.contains({$0 === self}) {
                 self.writeSeenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
             } else {
                 seenFields.append(self)
-                self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+                self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key, explicitNull: explicitNull)
             }
         }
     }
     
-    public func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+    public func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String, explicitNull: Bool = false) {
         // Implement in subclass
     }
     
