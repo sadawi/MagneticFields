@@ -31,11 +31,17 @@ public class ValueTransformer<T>: ValueTransformerType {
         self.exportAction = exportAction
     }
     
-    
+    /**
+     Attempts to convert an external value to an internal form.  If that's not possible, or if the external value is nil, returns nil.
+     */
     public func importValue(value:AnyObject?) -> T? {
         return self.importAction?(value)
     }
 
+    /**
+     Transforms a value into an external form suitable for serialization.
+     - parameter explicitNull: If false, export nil values as nil. If true, export nil values as a special null value (defaulting to NSNull)
+     */
     public func exportValue(value:T?, explicitNull: Bool = false) -> AnyObject? {
         if let value = self.exportAction?(value) {
             return value
@@ -44,6 +50,10 @@ public class ValueTransformer<T>: ValueTransformerType {
         }
     }
     
+    /**
+     Generates an external value representing nil.
+     - parameter explicit: Whether the value should be a special (non-nil) value.
+     */
     public func nullValue(explicit explicit: Bool = false) -> AnyObject? {
         return explicit ? NSNull() : nil
     }
