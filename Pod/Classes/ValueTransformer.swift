@@ -37,11 +37,10 @@ public class ValueTransformer<T>: ValueTransformerType {
     }
 
     public func exportValue(value:T?, explicitNull: Bool = false) -> AnyObject? {
-        let value = self.exportAction?(value)
-        if value == nil {
-            return self.nullValue(explicit: explicitNull)
-        } else {
+        if let value = self.exportAction?(value) {
             return value
+        } else {
+            return self.nullValue(explicit: explicitNull)
         }
     }
     
