@@ -215,6 +215,13 @@ class FieldTests: XCTestCase {
         XCTAssertTrue(state2.isInvalid)
     }
 
+    func testNulls() {
+        let field = Field<String>(key: "name")
+        var dictionary: [String:AnyObject] = [:]
+        field.writeToDictionary(&dictionary, explicitNull: true)
+        XCTAssert(dictionary["name"] is NSNull)
+    }
+    
 }
 
 

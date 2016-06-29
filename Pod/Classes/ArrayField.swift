@@ -82,7 +82,7 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         }
     }
     
-    public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+    public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String, explicitNull: Bool = false) {
         if let key = self.key, let value = self.value {
             dictionary[key] = value.map { self.field.valueTransformer().exportValue($0) }.flatMap { $0 }
         }

@@ -64,20 +64,14 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
             self.value = self.valueTransformer().importValue(dictionaryValue)
         }
     }
-    
-    public override func writeToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType]) {
-        if let key = self.key {
-            if seenFields.contains({$0 === self}) {
-                self.writeSeenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
-            } else {
-                seenFields.append(self)
-                self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
-            }
-        }
-    }
 
-    public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
-        dictionary[key] = self.valueTransformer().exportValue(self.value)
+    public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String, explicitNull: Bool = false) {
+        let value = self.valueTransformer().exportValue(self.value)
+        if value == nil && explicitNull {
+            dictionary[key] = NSNull()
+        } else {
+            dictionary[key] = value
+        }
     }
 
     public override func writeSeenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
