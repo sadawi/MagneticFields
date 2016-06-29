@@ -66,12 +66,7 @@ public class Field<T:Equatable>: BaseField<T>, Equatable {
     }
 
     public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String, explicitNull: Bool = false) {
-        let value = self.valueTransformer().exportValue(self.value)
-        if value == nil && explicitNull {
-            dictionary[key] = NSNull()
-        } else {
-            dictionary[key] = value
-        }
+        dictionary[key] = self.valueTransformer().exportValue(self.value, explicitNull: explicitNull)
     }
 
     public override func writeSeenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
