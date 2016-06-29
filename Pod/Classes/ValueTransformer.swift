@@ -35,9 +35,18 @@ public class ValueTransformer<T>: ValueTransformerType {
     public func importValue(value:AnyObject?) -> T? {
         return self.importAction?(value)
     }
-    
+
     public func exportValue(value:T?) -> AnyObject? {
         return self.exportAction?(value)
+    }
+    
+    public final func exportValue(value:T?, explicitNull: Bool) -> AnyObject? {
+        let value = self.exportValue(value)
+        if value == nil && explicitNull {
+            return NSNull()
+        } else {
+            return value
+        }
     }
 }
 
