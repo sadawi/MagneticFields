@@ -218,7 +218,13 @@ class FieldTests: XCTestCase {
     func testNulls() {
         let field = Field<String>(key: "name")
         var dictionary: [String:AnyObject] = [:]
+        
+        field.writeToDictionary(&dictionary)
+        XCTAssert(dictionary["name"] == nil)
+        XCTAssertFalse(dictionary["name"] is NSNull)
+        
         field.writeToDictionary(&dictionary, explicitNull: true)
+        XCTAssert(dictionary["name"] != nil)
         XCTAssert(dictionary["name"] is NSNull)
     }
     
