@@ -228,7 +228,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     }
     
     public func requireNotNil() -> Self {
-        return self.require(message: "Field is required", allowNil:false) { T -> Bool in return true }
+        return self.require(message: "is required", allowNil:false) { T -> Bool in return true }
     }
     
     public func require(rule: ValidationRule<T>) -> Self {
