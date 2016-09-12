@@ -148,7 +148,7 @@ public class Transformation<T, U>: Observable, Observer {
 /**
  Chainable transformation operator.
  */
-public func --><T, U where T:Observable>(observable: T, closure: (T.ObservableValueType? -> U)) -> Transformation<T.ObservableValueType,U> {
+public func --><T, U where T:Observable>(observable: T, closure: (T.ObservableValueType? -> U?)) -> Transformation<T.ObservableValueType,U> {
     let transformation = Transformation { (input: T.ObservableValueType?)->U? in
         return closure(input)
     }

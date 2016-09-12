@@ -282,15 +282,23 @@ class ValueFieldTests: XCTestCase {
     func testChainingClosure() {
         let a = Entity()
         
-        let observation = ( a.name --> { $0?.uppercaseString } )
+        let transformation = ( a.name --> { $0?.uppercaseString } )
         a.name.value = "alice"
-        XCTAssertEqual("ALICE", observation.value!)
+        XCTAssertEqual("ALICE", transformation.value!)
         a.name.value = "bob"
-        XCTAssertEqual("BOB", observation.value!)
+        XCTAssertEqual("BOB", transformation.value!)
         
-//        let b = Entity()
-//        a.name --> { $0?.uppercaseString } --> b.name
-//        a.name.value = "alice"
-//        XCTAssertEqual(b.name.value, "ALICE")
+        let b = Entity()
+        transformation --> b.name
+        XCTAssertEqual("BOB", b.name.value!)
+        
+        a.name.value = "carla"
+        XCTAssertEqual(b.name.value!, "CARLA")
+        
+        let c = Entity()
+        let d = Entity()
+        c.name --> { $0?.uppercaseString } --> d.name
+        c.name.value = "alice"
+        XCTAssertEqual(d.name.value, "ALICE")
     }
 }
