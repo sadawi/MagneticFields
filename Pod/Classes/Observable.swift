@@ -16,9 +16,9 @@ import Foundation
  Note: The only reason this is a class protocol is that marking its methods as "mutating" seemed to cause segfaults!
  */
 public protocol Observable: class {
-    associatedtype ValueType
-    var value: ValueType? { get set }
-    var observations: ObservationRegistry<ValueType> { get }
+    associatedtype ObservableValueType
+    var value: ObservableValueType? { get set }
+    var observations: ObservationRegistry<ObservableValueType> { get }
 }
 
 public extension Observable {
@@ -27,9 +27,9 @@ public extension Observable {
      
      - parameter observer: an Observer object that will receive change notifications
      */
-    public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U) -> Observation<ValueType> {
-        let observation = Observation<ValueType>()
-        observation.onChange = { (value:ValueType?) -> Void in
+    public func addObserver<U:Observer where U.ObserverValueType==ObservableValueType>(observer:U) -> Observation<ObservableValueType> {
+        let observation = Observation<ObservableValueType>()
+        observation.onChange = { (value:ObservableValueType?) -> Void in
             observer.valueChanged(value, observable:self)
         }
         observation.valueChanged(self.value)
@@ -45,7 +45,7 @@ public extension Observable {
      
      - parameter onChange: A closure to be run when the value changes
      */
-    public func addObserver(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+    public func addObserver(onChange onChange:(ObservableValueType? -> Void)) -> Observation<ObservableValueType> {
         let observation = self.createClosureObservation(onChange: onChange)
         self.observations.setNil(observation)
         return observation
@@ -57,14 +57,14 @@ public extension Observable {
      - parameter owner: The observation owner, used only as a key for registering the action
      - parameter onChange: A closure to be run when the value changes
      */
-    public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+    public func addObserver<U:Observer where U.ObserverValueType==ObservableValueType>(owner owner:U, onChange:(ObservableValueType? -> Void)) -> Observation<ObservableValueType> {
         let observation = self.createClosureObservation(onChange: onChange)
         self.observations.set(owner, observation)
         return observation
     }
     
-    private func createClosureObservation(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
-        let observation = Observation<ValueType>()
+    private func createClosureObservation(onChange onChange:(ObservableValueType? -> Void)) -> Observation<ObservableValueType> {
+        let observation = Observation<ObservableValueType>()
         observation.onChange = onChange
         observation.valueChanged(self.value)
         observation.getValue = { [weak self] in
@@ -89,7 +89,7 @@ public extension Observable {
     /**
      Unregisters an observer
      */
-    public func removeObserver<U:Observer where U.ValueType==ValueType>(observer:U) {
+    public func removeObserver<U:Observer where U.ObserverValueType==ObservableValueType>(observer:U) {
         self.observations.remove(observer)
     }
 }
@@ -99,25 +99,50 @@ infix operator --> { associativity left precedence 95 }
 infix operator -/-> { associativity left precedence 95 }
 infix operator <--> { associativity left precedence 95 }
 
-public func <--<T:Observable, U:Observer where U.ValueType == T.ValueType>(observer:U, observedField:T) {
+public func <--<T:Observable, U:Observer where U.ObserverValueType == T.ObservableValueType>(observer:U, observedField:T) {
     observedField.addObserver(observer)
 }
 
-public func --><T:Observable, U:Observer where U.ValueType == T.ValueType>(observable:T, observer:U) -> Observation<T.ValueType> {
+public func --><T:Observable, U:Observer where U.ObserverValueType == T.ObservableValueType>(observable:T, observer:U) -> Observation<T.ObservableValueType> {
     return observable.addObserver(observer)
 }
 
-public func --><T:Observable>(observable:T, onChange:(T.ValueType? -> Void)) -> Observation<T.ValueType> {
+public func --><T:Observable>(observable:T, onChange:(T.ObservableValueType? -> Void)) -> Observation<T.ObservableValueType> {
     return observable.addObserver(onChange: onChange)
 }
 
-public func -/-><T:Observable, U:Observer where U.ValueType == T.ValueType>(observable:T, observer:U) {
+public func -/-><T:Observable, U:Observer where U.ObserverValueType == T.ObservableValueType>(observable:T, observer:U) {
     observable.removeObserver(observer)
 }
 
-public func <--><T, U where T:Observer, T:Observable, U:Observer, U:Observable, T.ValueType == U.ValueType>(left: T, right: U) {
+public func <--><T, U where T:Observer, T:Observable, U:Observer, U:Observable, T.ObserverValueType == U.ObservableValueType, T.ObservableValueType == U.ObserverValueType>(left: T, right: U) {
     // Order is important!
     right.addObserver(left)
     left.addObserver(right)
 }
 
+// MARK: Chaining transformations
+
+public class Transformation<T, U>: Observable, Observer {
+    public typealias ObserverValueType = T
+    public typealias ObservableValueType = U
+    var closure: ((T?)->U?)
+    public var observations = ObservationRegistry<U>()
+
+    public init(closure: ((T?)->U?)) {
+        self.closure = closure
+    }
+    
+    func apply(value: T?) -> U? {
+        return self.closure(value)
+    }
+    
+    public var value: U?
+    
+    public func valueChanged<ObservableType:Observable>(value:T?, observable:ObservableType?) {
+        self.value = self.apply(value)
+    }
+}
+
+//public func --><T, U where T:Observable>(observable: T, transformation: (T.ObservableValueType? -> Transformation<T, U>)) {
+//}

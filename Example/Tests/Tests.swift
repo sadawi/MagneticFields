@@ -279,6 +279,16 @@ class ValueFieldTests: XCTestCase {
         
     }
     
+//    func testChaining() {
+//        let a = Entity()
+//        let b = Entity()
+//        
+//        a.name --> { $0?.uppercaseString } --> b.name
+//        
+//        a.name.value = "alice"
+//        XCTAssertEqual(b.name.value, "ALICE")
+//    }
+    
 //    func testChainingClosure() {
 //        let a = Entity()
 //        

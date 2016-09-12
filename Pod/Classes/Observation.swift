@@ -64,7 +64,7 @@ public class ObservationRegistry<V> {
         }
     }
     
-    func get<U:Observer where U.ValueType==V>(observer:U?) -> Observation<V>? {
+    func get<U:Observer where U.ObserverValueType==V>(observer:U?) -> Observation<V>? {
         return self.observations.objectForKey(observer) as? Observation<V>
     }
 
@@ -76,7 +76,7 @@ public class ObservationRegistry<V> {
         self.observations.setObject(observation, forKey: owner)
     }
     
-    func remove<U:Observer where U.ValueType==V>(observer:U) {
+    func remove<U:Observer where U.ObserverValueType==V>(observer:U) {
         self.observations.removeObjectForKey(observer)
     }
 
