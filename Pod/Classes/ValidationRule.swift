@@ -16,7 +16,7 @@ public class ValidationRule<ValueType> {
     public init() { }
     
     public init(test:(ValueType -> Bool), message:String?=nil, allowNil:Bool = true) {
-        self.message = message ?? "Value is invalid"
+        self.message = message ?? "is invalid"
         self.test = test
         self.allowNil = allowNil
     }
@@ -51,13 +51,13 @@ public class RangeRule<T:Comparable>: ValidationRule<T> {
     override func validate(value: T) -> Bool {
         if let minimum = self.minimum {
             if value < minimum {
-                self.message = "Value must be greater than \(minimum)"
+                self.message = "must be greater than \(minimum)"
                 return false
             }
         }
         if let maximum = self.maximum {
             if value > maximum {
-                self.message = "Value must be less than \(maximum)"
+                self.message = "must be less than \(maximum)"
                 return false
             }
         }
@@ -95,7 +95,7 @@ public class LengthRule: TransformerRule<String, Int> {
 public class NotBlankRule: ValidationRule<String> {
     override public init() {
         super.init()
-        self.message = "Value cannot be blank"
+        self.message = "cannot be blank"
     }
     
     override public func validate(value: String?) -> Bool {
