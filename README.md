@@ -123,7 +123,7 @@ sourceField --> destinationField
 ```
 This will set the value of `destinationField` to that of `sourceField` immediately, and again whenever `sourceField`'s value changes.
 
-The `<-->` operator is a shortcut for `<--` followed by `-->` (and can only be used between two Fields).
+The `<-->` operator is a shortcut for `<--` followed by `-->` (and can only be used between two types with the same value type).
 
 ```swift
 field1 <--> field2
