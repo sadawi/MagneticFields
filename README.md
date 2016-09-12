@@ -143,6 +143,14 @@ let age = Field<Int>()
 name --> age
 ```
 
+### Transformations
+
+An intermediate transformation closure can be inserted into an observation:
+
+```swift
+c.name --> { $0?.uppercaseString } --> d.name
+```
+
 ### Unregistering
 
 Unregistering observers is done with the `removeObserver` method, or the `-/->` operator.  All observers can be removed with `removeAllObservers()`.
