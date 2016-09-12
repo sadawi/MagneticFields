@@ -180,18 +180,23 @@ public class BaseField<T>: FieldType, Observer, Observable {
      - returns: A ValidationState that includes error messages, if applicable.
      */
     public func validate() -> ValidationState {
-        if self.validationState == .Unknown {
-            var valid = true
-            var messages:[String] = []
-            for validator in self.validationRules {
-                if validator.validate(self.value) == false {
-                    valid = false
-                    if let message = validator.message {
-                        messages.append(message)
-                    }
+        var valid = true
+        var messages:[String] = []
+        for validator in self.validationRules {
+            if validator.validate(self.value) == false {
+                valid = false
+                if let message = validator.message {
+                    messages.append(message)
                 }
             }
-            self.validationState = valid ? .Valid : .Invalid(messages)
+        }
+        self.validationState = valid ? .Valid : .Invalid(messages)
+        return self.validationState
+    }
+    
+    public func validateIfNeeded() -> ValidationState {
+        if self.validationState == .Unknown {
+            self.validate()
         }
         return self.validationState
     }
@@ -200,7 +205,6 @@ public class BaseField<T>: FieldType, Observer, Observable {
         self.validationState = .Unknown
     }
     
-    // TODO: think about this. If I set an error manually, validate() won't run the validators.
     public func addValidationError(message:String) {
         switch self.validationState {
         case .Invalid(var messages):

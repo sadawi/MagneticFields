@@ -87,7 +87,7 @@ class FieldTests: XCTestCase {
     
     
     class ValidatedPerson {
-        let age             = Field<Int>().require { $0 > 0 }
+        let age             = Field<Int>().require(message: "must be greater than 0") { $0 > 0 }
         let evenNumber      = Field<Int>().require(message: "must be even") { $0 % 2 == 0 }
         let name            = Field<String>()
         
@@ -117,6 +117,27 @@ class FieldTests: XCTestCase {
         XCTAssertFalse(person.longString.validate().isValid)
         person.longString.value = "123456789A"
         XCTAssertTrue(person.longString.validate().isValid)
+    }
+    
+    func testCustomValidation() {
+        let person = ValidatedPerson()
+        person.age.value = -10
+        
+        person.age.validate()
+        person.age.addValidationError("oops")
+        let validationState = person.age.validationState
+        
+        switch validationState {
+        case .Invalid(let errors):
+            XCTAssert(errors.count == 2)
+            XCTAssertEqual(errors[0], "must be greater than 0")
+            print(errors)
+        default:
+            XCTFail()
+        }
+        
+        
+        XCTAssertFalse(person.age.validate().isValid)
     }
     
     func testMoreValidators() {
