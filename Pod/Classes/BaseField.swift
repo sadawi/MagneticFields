@@ -176,15 +176,6 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     /**
      Test whether the current field value passes all the validation rules.
-     */
-    public var valid:Bool {
-        get {
-            return self.validate() == .Valid
-        }
-    }
-    
-    /**
-     Test whether the current field value passes all the validation rules.
      
      - returns: A ValidationState that includes error messages, if applicable.
      */

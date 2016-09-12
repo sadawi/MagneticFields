@@ -100,31 +100,31 @@ class FieldTests: XCTestCase {
         
         person.age.value = -10
         
-        XCTAssert(person.age.valid == false)
+        XCTAssert(person.age.validate().isValid == false)
         
         person.age.value = 10
-        XCTAssert(person.age.valid == true)
+        XCTAssert(person.age.validate().isValid == true)
         
         person.evenNumber.value = 3
-        XCTAssertFalse(person.evenNumber.valid)
+        XCTAssertFalse(person.evenNumber.validate().isValid)
         XCTAssertEqual(ValidationState.Invalid(["must be even"]), person.evenNumber.validate())
         
-        XCTAssertFalse(person.requiredField.valid)
+        XCTAssertFalse(person.requiredField.validate().isValid)
         person.requiredField.value = "hello"
-        XCTAssertTrue(person.requiredField.valid)
+        XCTAssertTrue(person.requiredField.validate().isValid)
         
         person.longString.value = "123456789"
-        XCTAssertFalse(person.longString.valid)
+        XCTAssertFalse(person.longString.validate().isValid)
         person.longString.value = "123456789A"
-        XCTAssertTrue(person.longString.valid)
+        XCTAssertTrue(person.longString.validate().isValid)
     }
     
     func testMoreValidators() {
         let notBlankString = Field<String>().require(NotBlankRule())
         notBlankString.value = ""
-        XCTAssertFalse(notBlankString.valid)
+        XCTAssertFalse(notBlankString.validate().isValid)
         notBlankString.value = "hi"
-        XCTAssertTrue(notBlankString.valid)
+        XCTAssertTrue(notBlankString.validate().isValid)
     }
     
     func testTimestamps() {
