@@ -10,8 +10,8 @@ import Foundation
 
 
 public enum LoadState {
-    case NotSet
-    case Set
+    case NotLoaded
+    case Loaded
     case Loading
     case Error
 }
@@ -49,7 +49,7 @@ public protocol FieldType:AnyObject {
     var priority: Int { get set }
     var key: String? { get set }
     var validationState:ValidationState { get }
-    var state:LoadState { get }
+    var loadState:LoadState { get }
     
     func addValidationError(message:String)
     func resetValidationState()
@@ -81,7 +81,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     /**
      Information about whether this field's value has been set
      */
-    public var state:LoadState = .NotSet
+    public var loadState:LoadState = .NotLoaded
     
     /**
      A human-readable name for this field.
@@ -132,7 +132,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     }
     
     public func valueUpdated(oldValue oldValue:T?, newValue: T?) {
-        self.state = .Set
+        self.loadState = .Loaded
         self.validationState = .Unknown
         self.updatedAt = NSDate()
         self.valueUpdatedHandler?(newValue)
@@ -161,7 +161,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
             self.value = value
             
             // didSet isn't triggered from init
-            self.state = .Set
+            self.loadState = .Loaded
         }
         self.name = name
         self.priority = priority

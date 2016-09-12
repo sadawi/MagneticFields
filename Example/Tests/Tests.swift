@@ -70,10 +70,10 @@ class FieldTests: XCTestCase {
 
     func testStates() {
         let entity = Entity()
-        XCTAssertEqual(entity.name.state, LoadState.NotSet)
+        XCTAssertEqual(entity.name.loadState, LoadState.NotLoaded)
         
         entity.name.value = "Bob"
-        XCTAssertEqual(entity.name.state, LoadState.Set)
+        XCTAssertEqual(entity.name.loadState, LoadState.Loaded)
     }
     
     func testOperators() {
@@ -248,7 +248,7 @@ class ValueFieldTests: XCTestCase {
         let object = ValueObject()
         XCTAssertEqual("red", object.color.value)
         XCTAssertEqual("shelf", object.label.value?.name)
-        XCTAssertEqual(LoadState.Set, object.color.state)
+        XCTAssertEqual(LoadState.Loaded, object.color.loadState)
         
         let object2 = ValueObject()
         XCTAssertEqual("shelf", object2.label.value?.name)
