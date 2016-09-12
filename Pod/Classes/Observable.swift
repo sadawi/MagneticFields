@@ -17,7 +17,7 @@ import Foundation
  */
 public protocol Observable: class {
     associatedtype ObservableValueType
-    var value: ObservableValueType? { get set }
+    var value: ObservableValueType? { get }
     var observations: ObservationRegistry<ObservableValueType> { get }
 }
 
@@ -137,12 +137,21 @@ public class Transformation<T, U>: Observable, Observer {
         return self.closure(value)
     }
     
-    public var value: U?
+    public private(set) var value: U?
     
     public func valueChanged<ObservableType:Observable>(value:T?, observable:ObservableType?) {
         self.value = self.apply(value)
+        self.notifyObservers()
     }
 }
 
-//public func --><T, U where T:Observable>(observable: T, transformation: (T.ObservableValueType? -> Transformation<T, U>)) {
-//}
+/**
+ Chainable transformation operator.
+ */
+public func --><T, U where T:Observable>(observable: T, closure: (T.ObservableValueType? -> U)) -> Transformation<T.ObservableValueType,U> {
+    let transformation = Transformation { (input: T.ObservableValueType?)->U? in
+        return closure(input)
+    }
+    observable.addObserver(transformation)
+    return transformation
+}
