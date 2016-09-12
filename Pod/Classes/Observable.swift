@@ -146,7 +146,15 @@ public class Transformation<T, U>: Observable, Observer {
 }
 
 /**
- Chainable transformation operator.
+ Chainable transformation operator. Takes a closure and creates a Transformation object that can itself be observed.
+ 
+ Example: 
+    c.name --> { $0?.uppercaseString } --> d.name
+ 
+ - parameter observable: The object whose value is to be transformed
+ - parameter closure: How the value is to be transformed
+ - returns: A Transformation object from which the transformed value can be retrieved; it is itself Observable, so it can be chained into another Observer. 
+ 
  */
 public func --><T, U where T:Observable>(observable: T, closure: (T.ObservableValueType? -> U?)) -> Transformation<T.ObservableValueType,U> {
     let transformation = Transformation { (input: T.ObservableValueType?)->U? in
