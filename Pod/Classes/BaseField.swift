@@ -10,8 +10,8 @@ import Foundation
 
 
 public enum LoadState {
-    case NotSet
-    case Set
+    case NotLoaded
+    case Loaded
     case Loading
     case Error
 }
@@ -49,7 +49,7 @@ public protocol FieldType:AnyObject {
     var priority: Int { get set }
     var key: String? { get set }
     var validationState:ValidationState { get }
-    var state:LoadState { get }
+    var loadState:LoadState { get }
     
     func addValidationError(message:String)
     func resetValidationState()
@@ -81,7 +81,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     /**
      Information about whether this field's value has been set
      */
-    public var state:LoadState = .NotSet
+    public var loadState:LoadState = .NotLoaded
     
     /**
      A human-readable name for this field.
@@ -132,7 +132,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     }
     
     public func valueUpdated(oldValue oldValue:T?, newValue: T?) {
-        self.state = .Set
+        self.loadState = .Loaded
         self.validationState = .Unknown
         self.updatedAt = NSDate()
         self.valueUpdatedHandler?(newValue)
@@ -161,7 +161,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
             self.value = value
             
             // didSet isn't triggered from init
-            self.state = .Set
+            self.loadState = .Loaded
         }
         self.name = name
         self.priority = priority
@@ -176,31 +176,27 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     /**
      Test whether the current field value passes all the validation rules.
-     */
-    public var valid:Bool {
-        get {
-            return self.validate() == .Valid
-        }
-    }
-    
-    /**
-     Test whether the current field value passes all the validation rules.
      
      - returns: A ValidationState that includes error messages, if applicable.
      */
     public func validate() -> ValidationState {
-        if self.validationState == .Unknown {
-            var valid = true
-            var messages:[String] = []
-            for validator in self.validationRules {
-                if validator.validate(self.value) == false {
-                    valid = false
-                    if let message = validator.message {
-                        messages.append(message)
-                    }
+        var valid = true
+        var messages:[String] = []
+        for validator in self.validationRules {
+            if validator.validate(self.value) == false {
+                valid = false
+                if let message = validator.message {
+                    messages.append(message)
                 }
             }
-            self.validationState = valid ? .Valid : .Invalid(messages)
+        }
+        self.validationState = valid ? .Valid : .Invalid(messages)
+        return self.validationState
+    }
+    
+    public func validateIfNeeded() -> ValidationState {
+        if self.validationState == .Unknown {
+            self.validate()
         }
         return self.validationState
     }
@@ -209,7 +205,6 @@ public class BaseField<T>: FieldType, Observer, Observable {
         self.validationState = .Unknown
     }
     
-    // TODO: think about this. If I set an error manually, validate() won't run the validators.
     public func addValidationError(message:String) {
         switch self.validationState {
         case .Invalid(var messages):
@@ -233,7 +228,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
     }
     
     public func requireNotNil() -> Self {
-        return self.require(message: "Field is required", allowNil:false) { T -> Bool in return true }
+        return self.require(message: "is required", allowNil:false) { T -> Bool in return true }
     }
     
     public func require(rule: ValidationRule<T>) -> Self {

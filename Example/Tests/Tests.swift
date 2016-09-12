@@ -70,10 +70,10 @@ class FieldTests: XCTestCase {
 
     func testStates() {
         let entity = Entity()
-        XCTAssertEqual(entity.name.state, LoadState.NotSet)
+        XCTAssertEqual(entity.name.loadState, LoadState.NotLoaded)
         
         entity.name.value = "Bob"
-        XCTAssertEqual(entity.name.state, LoadState.Set)
+        XCTAssertEqual(entity.name.loadState, LoadState.Loaded)
     }
     
     func testOperators() {
@@ -87,7 +87,7 @@ class FieldTests: XCTestCase {
     
     
     class ValidatedPerson {
-        let age             = Field<Int>().require { $0 > 0 }
+        let age             = Field<Int>().require(message: "must be greater than 0") { $0 > 0 }
         let evenNumber      = Field<Int>().require(message: "must be even") { $0 % 2 == 0 }
         let name            = Field<String>()
         
@@ -100,31 +100,52 @@ class FieldTests: XCTestCase {
         
         person.age.value = -10
         
-        XCTAssert(person.age.valid == false)
+        XCTAssert(person.age.validate().isValid == false)
         
         person.age.value = 10
-        XCTAssert(person.age.valid == true)
+        XCTAssert(person.age.validate().isValid == true)
         
         person.evenNumber.value = 3
-        XCTAssertFalse(person.evenNumber.valid)
+        XCTAssertFalse(person.evenNumber.validate().isValid)
         XCTAssertEqual(ValidationState.Invalid(["must be even"]), person.evenNumber.validate())
         
-        XCTAssertFalse(person.requiredField.valid)
+        XCTAssertFalse(person.requiredField.validate().isValid)
         person.requiredField.value = "hello"
-        XCTAssertTrue(person.requiredField.valid)
+        XCTAssertTrue(person.requiredField.validate().isValid)
         
         person.longString.value = "123456789"
-        XCTAssertFalse(person.longString.valid)
+        XCTAssertFalse(person.longString.validate().isValid)
         person.longString.value = "123456789A"
-        XCTAssertTrue(person.longString.valid)
+        XCTAssertTrue(person.longString.validate().isValid)
+    }
+    
+    func testCustomValidation() {
+        let person = ValidatedPerson()
+        person.age.value = -10
+        
+        person.age.validate()
+        person.age.addValidationError("oops")
+        let validationState = person.age.validationState
+        
+        switch validationState {
+        case .Invalid(let errors):
+            XCTAssert(errors.count == 2)
+            XCTAssertEqual(errors[0], "must be greater than 0")
+            print(errors)
+        default:
+            XCTFail()
+        }
+        
+        
+        XCTAssertFalse(person.age.validate().isValid)
     }
     
     func testMoreValidators() {
         let notBlankString = Field<String>().require(NotBlankRule())
         notBlankString.value = ""
-        XCTAssertFalse(notBlankString.valid)
+        XCTAssertFalse(notBlankString.validate().isValid)
         notBlankString.value = "hi"
-        XCTAssertTrue(notBlankString.valid)
+        XCTAssertTrue(notBlankString.validate().isValid)
     }
     
     func testTimestamps() {
@@ -248,7 +269,7 @@ class ValueFieldTests: XCTestCase {
         let object = ValueObject()
         XCTAssertEqual("red", object.color.value)
         XCTAssertEqual("shelf", object.label.value?.name)
-        XCTAssertEqual(LoadState.Set, object.color.state)
+        XCTAssertEqual(LoadState.Loaded, object.color.loadState)
         
         let object2 = ValueObject()
         XCTAssertEqual("shelf", object2.label.value?.name)

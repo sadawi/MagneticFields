@@ -31,9 +31,9 @@ class Person {
 person.age.value = 10
 ```
 
-## Field types
+## Field classes
 
-The basic field type is `Field`, a generic class whose type parameter is its value type.  For multivalued fields, there is `ArrayField`, which wraps another field that describes the single-valued type.  
+The basic field class is `Field`, parameterized by its value type.  For multivalued fields, there is `ArrayField`, which wraps a field object describing the single-valued type.
 
 ```swift
 let tag = Field<String>(name: "Tag")
@@ -149,17 +149,17 @@ Unregistering observers is done with the `removeObserver` method, or the `-/->` 
 
 ## Load State
 
-It can be useful to distinguish between a value that's nil because hasn't been loaded yet (e.g., from an API), and one that is known to be nil.  For this, fields provide the `state` property, whose values are in the `LoadState` enum:
+It can be useful to distinguish between a value that's nil because hasn't been loaded yet (e.g., from an API), and one that is known to be nil.  For this, fields provide the `loadState` property, whose values are in the `LoadState` enum:
 
 ```swift
 public enum LoadState {
-    case NotSet
-    case Set
+    case NotLoaded
+    case Loaded
     case Loading
     case Error
 }
 ```
 
-All fields are initially in the `.NotSet` state, but automatically become `.Set` when their value is set to anything.
+All fields are initially in the `.NotLoaded` state, but automatically become `.Loaded` when their value is set to anything.
 
 The `.Loading` state can be useful when the process of loading takes time.  You might decide to show a spinner in the UI while making an API request, for example.
