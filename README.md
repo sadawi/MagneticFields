@@ -33,11 +33,17 @@ person.age.value = 10
 
 ## Field classes
 
-The basic field class is `Field`, parameterized by its value type.  For multivalued fields, there is `ArrayField`, which wraps a field object describing the single-valued type.
+The basic field class is `Field`, parameterized by its value type.
 
 ```swift
 let tag = Field<String>(name: "Tag")
-let tags = ArrayField(Field<String>(), name: "Tag")
+let age = Field<Int>(name: "Age")
+```
+
+For multivalued fields, there is `ArrayField`, which wraps a field object describing the single-valued type.
+
+```swift
+let tags = ArrayField(Field<String>(), name: "Tags")
 ```
 
 The inner field is responsible for validations, transformations, etc..  The `ArrayField` owns top-level attributes like `name`, `key`, etc. -- but for convenience, it will copy them from the inner field at initialization.
@@ -45,7 +51,7 @@ The inner field is responsible for validations, transformations, etc..  The `Arr
 The unary prefix operator `*` is provided to wrap a `Field` in an `ArrayField`.  So you can also write the above declaration like this:
 
 ```swift
-let tags = *Field<String>(name: "Tag")
+let tags = *Field<String>(name: "Tags")
 ```
 
 
