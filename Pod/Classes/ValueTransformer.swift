@@ -43,8 +43,8 @@ open class ValueTransformer<T>: ValueTransformerType {
      - parameter explicitNull: If false, export nil values as nil. If true, export nil values as a special null value (defaulting to NSNull)
      */
     open func exportValue(_ value:T?, explicitNull: Bool = false) -> AnyObject? {
-        if let value = self.exportAction?(value) {
-            return value
+        if let exportedValue = self.exportAction?(value) {
+            return exportedValue
         } else {
             return type(of: self).nullValue(explicit: explicitNull)
         }
