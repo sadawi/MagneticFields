@@ -103,11 +103,11 @@ public func <--<T:Observable, U:Observer>(observer:U, observedField:T) where U.V
     observedField.addObserver(observer)
 }
 
-public func --><T:Observable, U:Observer>(observable:T, observer:U) -> Observation<T.ValueType> where U.ValueType == T.ValueType {
+@discardableResult public func --><T:Observable, U:Observer>(observable:T, observer:U) -> Observation<T.ValueType> where U.ValueType == T.ValueType {
     return observable.addObserver(observer)
 }
 
-public func --><T:Observable>(observable:T, onChange:@escaping ((T.ValueType?) -> Void)) -> Observation<T.ValueType> {
+@discardableResult public func --><T:Observable>(observable:T, onChange:@escaping ((T.ValueType?) -> Void)) -> Observation<T.ValueType> {
     return observable.addObserver(onChange: onChange)
 }
 

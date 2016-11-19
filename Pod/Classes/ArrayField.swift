@@ -84,7 +84,8 @@ open class ArrayField<T:Equatable>: BaseField<[T]> {
     
     open override func writeUnseenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
         if let key = self.key, let value = self.value {
-            dictionary[key] = value.map { self.field.valueTransformer().exportValue($0) }.flatMap { $0 }
+            let newValue = value.map { self.field.valueTransformer().exportValue($0) }.flatMap { $0 }
+            dictionary[key] = newValue as AnyObject
         }
     }
 

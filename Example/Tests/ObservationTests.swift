@@ -22,7 +22,7 @@ private class View:Observer, Observable {
     }
     
     // Observer
-    func valueChanged<ObservableType:Observable>(value:String?, observable: ObservableType?) {
+    func valueChanged<ObservableType:Observable>(_ value:String?, observable: ObservableType?) {
         self.value = value
     }
     

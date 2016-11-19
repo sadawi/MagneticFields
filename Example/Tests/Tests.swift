@@ -59,21 +59,21 @@ class FieldTests: XCTestCase {
         entity.color.writeToDictionary(&dict)
         XCTAssertEqual(dict["color"] as? String, "blue")
         
-        dict["color"] = "blue"
+        dict["color"] = "blue" as AnyObject
         entity.color.readFromDictionary(dict)
         XCTAssertEqual(entity.color.value, Color.Blue)
 
-        dict["color"] = "yellow"
+        dict["color"] = "yellow" as AnyObject
         entity.color.readFromDictionary(dict)
         XCTAssertNil(entity.color.value)
     }
 
     func testStates() {
         let entity = Entity()
-        XCTAssertEqual(entity.name.loadState, LoadState.NotLoaded)
+        XCTAssertEqual(entity.name.loadState, LoadState.notLoaded)
         
         entity.name.value = "Bob"
-        XCTAssertEqual(entity.name.loadState, LoadState.Loaded)
+        XCTAssertEqual(entity.name.loadState, LoadState.loaded)
     }
     
     func testOperators() {
@@ -107,7 +107,7 @@ class FieldTests: XCTestCase {
         
         person.evenNumber.value = 3
         XCTAssertFalse(person.evenNumber.validate().isValid)
-        XCTAssertEqual(ValidationState.Invalid(["must be even"]), person.evenNumber.validate())
+        XCTAssertEqual(ValidationState.invalid(["must be even"]), person.evenNumber.validate())
         
         XCTAssertFalse(person.requiredField.validate().isValid)
         person.requiredField.value = "hello"
@@ -123,12 +123,12 @@ class FieldTests: XCTestCase {
         let person = ValidatedPerson()
         person.age.value = -10
         
-        person.age.validate()
+        _ = person.age.validate()
         person.age.addValidationError("oops")
         let validationState = person.age.validationState
         
         switch validationState {
-        case .Invalid(let errors):
+        case .invalid(let errors):
             XCTAssert(errors.count == 2)
             XCTAssertEqual(errors[0], "must be greater than 0")
             print(errors)
@@ -173,7 +173,7 @@ class FieldTests: XCTestCase {
         
         XCTAssertEqual(dict["name"] as? String, "Bob")
         
-        dict["size"] = 100
+        dict["size"] = 100 as AnyObject
         a.size.readFromDictionary(dict)
         XCTAssertEqual(a.size.value, 100)
     }
@@ -182,9 +182,9 @@ class FieldTests: XCTestCase {
         let a = Entity()
         a.size.value = 100
         
-        a.size.transform(
+        _ = a.size.transform(
             importValue: { $0 as? Int },
-            exportValue: { $0 == nil ? nil : String($0) },
+            exportValue: { $0 == nil ? nil : (String(describing: $0) as AnyObject) },
             name: "stringify"
         )
         var dict:[String:AnyObject] = [:]
@@ -213,11 +213,11 @@ class FieldTests: XCTestCase {
         a.name.value = "Bob"
         XCTAssertEqual(a.name.anyObjectValue as? String, "Bob")
         
-        a.name.anyObjectValue = "Jane"
+        a.name.anyObjectValue = "Jane" as AnyObject
         XCTAssertEqual(a.name.anyObjectValue as? String, "Jane")
         
         // Trying to set invalid type has no effect (and does not raise error)
-        a.name.anyObjectValue = 5
+        a.name.anyObjectValue = 5 as AnyObject
         XCTAssertEqual(a.name.value, "Jane")
         
         // But setting nil does work
@@ -227,11 +227,11 @@ class FieldTests: XCTestCase {
     }
     
     func testValidationState() {
-        let state = ValidationState.Valid
+        let state = ValidationState.valid
         XCTAssertTrue(state.isValid)
         XCTAssertFalse(state.isInvalid)
         
-        let state2 = ValidationState.Invalid(["wrong"])
+        let state2 = ValidationState.invalid(["wrong"])
         XCTAssertFalse(state2.isValid)
         XCTAssertTrue(state2.isInvalid)
     }
@@ -269,7 +269,7 @@ class ValueFieldTests: XCTestCase {
         let object = ValueObject()
         XCTAssertEqual("red", object.color.value)
         XCTAssertEqual("shelf", object.label.value?.name)
-        XCTAssertEqual(LoadState.Loaded, object.color.loadState)
+        XCTAssertEqual(LoadState.loaded, object.color.loadState)
         
         let object2 = ValueObject()
         XCTAssertEqual("shelf", object2.label.value?.name)
