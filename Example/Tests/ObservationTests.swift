@@ -138,11 +138,6 @@ class ObservationTests: XCTestCase {
         object.value = "Phil"
         XCTAssertNotEqual(object.value, field.value)
         XCTAssertEqual(object.value, secondField.value)
-        
-        let intField = Field<Int>()
-        
-        // This should not compile:
-        //         object --> intField
     }
     
     func testChaining() {
