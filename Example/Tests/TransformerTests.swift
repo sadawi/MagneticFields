@@ -64,11 +64,11 @@ class TransformerTests: XCTestCase {
         let floatField = Field<Float>(key: "number")
         
         let floatDict = ["number": 3.0]
-        floatField.readFromDictionary(floatDict as [String : AnyObject])
+        floatField.read(from: floatDict as [String : AnyObject])
         XCTAssertEqual(3.0, floatField.value)
         
         let intDict = ["number": 2]
-        floatField.readFromDictionary(intDict as [String : AnyObject])
+        floatField.read(from: intDict as [String : AnyObject])
         XCTAssertEqual(2.0, floatField.value)
         
         let priceField = AutomaticField<Price>(key: "price")
@@ -77,7 +77,7 @@ class TransformerTests: XCTestCase {
         XCTAssertEqual(imported, Price(value: 0.2))
 
         let priceDict = ["price": 10.0]
-        priceField.readFromDictionary(priceDict as [String : AnyObject])
+        priceField.read(from: priceDict as [String : AnyObject])
         XCTAssertEqual(priceField.value?.value, 10.0)
     }
 }

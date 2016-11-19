@@ -56,15 +56,15 @@ class FieldTests: XCTestCase {
 
         var dict:[String:AnyObject] = [:]
         
-        entity.color.writeToDictionary(&dict)
+        entity.color.write(to: &dict)
         XCTAssertEqual(dict["color"] as? String, "blue")
         
         dict["color"] = "blue" as AnyObject
-        entity.color.readFromDictionary(dict)
+        entity.color.read(from: dict)
         XCTAssertEqual(entity.color.value, Color.Blue)
 
         dict["color"] = "yellow" as AnyObject
-        entity.color.readFromDictionary(dict)
+        entity.color.read(from: dict)
         XCTAssertNil(entity.color.value)
     }
 
@@ -169,12 +169,12 @@ class FieldTests: XCTestCase {
         a.name.value = "Bob"
 
         var dict:[String:AnyObject] = [:]
-        a.name.writeToDictionary(&dict)
+        a.name.write(to: &dict)
         
         XCTAssertEqual(dict["name"] as? String, "Bob")
         
         dict["size"] = 100 as AnyObject
-        a.size.readFromDictionary(dict)
+        a.size.read(from: dict)
         XCTAssertEqual(a.size.value, 100)
     }
     
@@ -189,7 +189,7 @@ class FieldTests: XCTestCase {
         )
         var dict:[String:AnyObject] = [:]
         
-        a.size.writeToDictionary(&dict)
+        a.size.write(to: &dict)
         XCTAssertNil(dict["size"] as? String)
 
         /** 
@@ -240,11 +240,11 @@ class FieldTests: XCTestCase {
         let field = Field<String>(key: "name")
         var dictionary: [String:AnyObject] = [:]
         
-        field.writeToDictionary(&dictionary)
+        field.write(to: &dictionary)
         XCTAssert(dictionary["name"] == nil)
         XCTAssertFalse(dictionary["name"] is NSNull)
         
-        field.writeToDictionary(&dictionary, explicitNull: true)
+        field.write(to: &dictionary, explicitNull: true)
         XCTAssert(dictionary["name"] != nil)
         XCTAssert(dictionary["name"] is NSNull)
     }

@@ -76,13 +76,13 @@ open class ArrayField<T:Equatable>: BaseField<[T]> {
     
     // MARK: - Dictionary values
     
-    open override func readFromDictionary(_ dictionary:[String:AnyObject]) {
+    open override func read(from dictionary:[String:AnyObject]) {
         if let key = self.key, let dictionaryValues = dictionary[key] as? [AnyObject] {
             self.value = dictionaryValues.map { self.field.valueTransformer().importValue($0) }.flatMap{$0}
         }
     }
     
-    open override func writeUnseenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
+    open override func writeUnseenValue(to dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
         if let key = self.key, let value = self.value {
             let newValue = value.map { self.field.valueTransformer().exportValue($0) }.flatMap { $0 }
             dictionary[key] = newValue as AnyObject

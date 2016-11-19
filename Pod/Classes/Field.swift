@@ -59,18 +59,18 @@ open class Field<T:Equatable>: BaseField<T>, Equatable {
     
     // MARK: - Dictionary values
     
-    open override func readFromDictionary(_ dictionary:[String:AnyObject]) {
+    open override func read(from dictionary:[String:AnyObject]) {
         if let key = self.key, let dictionaryValue = dictionary[key] {
             self.value = self.valueTransformer().importValue(dictionaryValue)
         }
     }
 
-    open override func writeUnseenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
+    open override func writeUnseenValue(to dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
         dictionary[key] = self.valueTransformer().exportValue(self.value, explicitNull: explicitNull)
     }
 
-    open override func writeSeenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String) {
-        self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+    open override func writeSeenValue(to dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String) {
+        self.writeUnseenValue(to: &dictionary, seenFields: &seenFields, key: key)
     }
 
 }

@@ -55,15 +55,15 @@ public protocol FieldType:AnyObject {
     func resetValidationState()
     func validate() -> ValidationState
 
-    func readFromDictionary(_ dictionary:[String:AnyObject])
-    func writeToDictionary(_ dictionary:inout [String:AnyObject], seenFields:inout [FieldType], explicitNull: Bool)
+    func read(from dictionary:[String:AnyObject])
+    func write(to dictionary:inout [String:AnyObject], seenFields:inout [FieldType], explicitNull: Bool)
 }
 
 public extension FieldType {
     /// A version of writeToDictionary with optional params, since that's not possible with just the protocol.
-    public func writeToDictionary(_ dictionary:inout [String:AnyObject], explicitNull: Bool = false) {
+    public func write(to dictionary:inout [String:AnyObject], explicitNull: Bool = false) {
         var seenFields:[FieldType] = []
-        self.writeToDictionary(&dictionary, seenFields: &seenFields, explicitNull: explicitNull)
+        self.write(to: &dictionary, seenFields: &seenFields, explicitNull: explicitNull)
     }
 }
 
@@ -254,23 +254,23 @@ open class BaseField<T>: FieldType, Observer, Observable {
     
     // MARK: - Dictionary values
     
-    open func readFromDictionary(_ dictionary:[String:AnyObject]) { }
-    open func writeToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], explicitNull: Bool = false) {
+    open func read(from dictionary:[String:AnyObject]) { }
+    open func write(to dictionary: inout [String : AnyObject], seenFields: inout [FieldType], explicitNull: Bool = false) {
         if let key = self.key {
             if seenFields.contains(where: {$0 === self}) {
-                self.writeSeenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
+                self.writeSeenValue(to: &dictionary, seenFields: &seenFields, key: key)
             } else {
                 seenFields.append(self)
-                self.writeUnseenValueToDictionary(&dictionary, seenFields: &seenFields, key: key, explicitNull: explicitNull)
+                self.writeUnseenValue(to: &dictionary, seenFields: &seenFields, key: key, explicitNull: explicitNull)
             }
         }
     }
     
-    open func writeUnseenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
+    open func writeUnseenValue(to dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
         // Implement in subclass
     }
     
-    open func writeSeenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String) {
+    open func writeSeenValue(to dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String) {
         // Implement in subclass
     }
     
