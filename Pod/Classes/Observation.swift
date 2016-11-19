@@ -46,7 +46,7 @@ open class Observation<T>: Observable {
  A mapping of owner objects to Observations.  Owner references are weak.  Observation references are strong.
  */
 open class ObservationRegistry<V> {
-    var observations:NSMapTable = NSMapTable.weakToStrongObjects()
+    var observations:NSMapTable<AnyObject, Observation<V>> = NSMapTable.weakToStrongObjects()
     
     public init() { }
 
@@ -65,7 +65,7 @@ open class ObservationRegistry<V> {
     }
     
     func get<U:Observer>(_ observer:U?) -> Observation<V>? where U.ValueType==V {
-        return self.observations.object(forKey: observer) as? Observation<V>
+        return self.observations.object(forKey: observer)
     }
 
     func setNil(_ observation:Observation<V>?) {
