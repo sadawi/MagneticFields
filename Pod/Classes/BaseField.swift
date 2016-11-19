@@ -109,7 +109,7 @@ open class BaseField<T>: FieldType, Observer, Observable {
     
     open var anyObjectValue:AnyObject? {
         get {
-            return self.value as? AnyObject
+            return self.value as AnyObject?
         }
         set {
             // Always set nil if it's passed in

@@ -43,7 +43,7 @@ open class ValueTransformer<T>: ValueTransformerType {
      - parameter explicitNull: If false, export nil values as nil. If true, export nil values as a special null value (defaulting to NSNull)
      */
     open func exportValue(_ value:T?, explicitNull: Bool = false) -> AnyObject? {
-        if let exportedValue = self.exportAction?(value) {
+        if let exportAction = self.exportAction, let exportedValue = exportAction(value) {
             return exportedValue
         } else {
             return type(of: self).nullValue(explicit: explicitNull)
@@ -72,6 +72,6 @@ open class ValueTransformer<T>: ValueTransformerType {
 open class SimpleValueTransformer<T>: ValueTransformer<T> {
     
     public required init() {
-        super.init(importAction: { $0 as? T }, exportAction: { $0 as? AnyObject } )
+        super.init(importAction: { $0 as? T }, exportAction: { $0 as AnyObject? } )
     }
 }
