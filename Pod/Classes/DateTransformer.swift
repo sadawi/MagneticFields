@@ -8,11 +8,11 @@
 
 import Foundation
 
-public class DateTransformer: ValueTransformer<NSDate> {
-    public var dateFormatter: NSDateFormatter = {
-        let result = NSDateFormatter()
-        result.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-        result.timeZone = NSTimeZone.localTimeZone()
+open class DateTransformer: ValueTransformer<Date> {
+    open var dateFormatter: DateFormatter = {
+        let result = DateFormatter()
+        result.locale = Locale(identifier: "en_US_POSIX")
+        result.timeZone = TimeZone.autoupdatingCurrent
         return result
     }()
     
@@ -20,12 +20,12 @@ public class DateTransformer: ValueTransformer<NSDate> {
         super.init()
     }
     
-    public convenience init(dateFormatter: NSDateFormatter) {
+    public convenience init(dateFormatter: DateFormatter) {
         self.init()
         self.dateFormatter = dateFormatter
     }
 
-    public convenience init(dateFormat: String, locale: NSLocale? = nil, timeZone: NSTimeZone? = nil) {
+    public convenience init(dateFormat: String, locale: Locale? = nil, timeZone: TimeZone? = nil) {
         self.init()
         self.dateFormatter.dateFormat = dateFormat
         if let locale = locale {
@@ -36,19 +36,19 @@ public class DateTransformer: ValueTransformer<NSDate> {
         }
     }
     
-    override public func importValue(value:AnyObject?) -> NSDate? {
+    override open func importValue(_ value:AnyObject?) -> Date? {
         if let value = value as? String {
-            return self.dateFormatter.dateFromString(value)
+            return self.dateFormatter.date(from: value)
         } else {
             return nil
         }
     }
     
-    override public func exportValue(value:NSDate?, explicitNull: Bool = false) -> AnyObject? {
+    override open func exportValue(_ value:Date?, explicitNull: Bool = false) -> AnyObject? {
         if let value = value {
-            return self.dateFormatter.stringFromDate(value)
+            return self.dateFormatter.string(from: value) as AnyObject?
         } else {
-            return self.dynamicType.nullValue(explicit: explicitNull)
+            return type(of: self).nullValue(explicit: explicitNull)
         }
     }
 }

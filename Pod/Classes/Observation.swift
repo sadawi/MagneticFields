@@ -19,12 +19,12 @@ import Foundation
  a --> b --> c
  ```
  */
-public class Observation<T>: Observable {
+open class Observation<T>: Observable {
     public typealias ValueType = T
     
-    public var observations = ObservationRegistry<T>()
+    open var observations = ObservationRegistry<T>()
     
-    public var value:T? {
+    open var value:T? {
         get {
             return self.getValue?()
         }
@@ -34,10 +34,10 @@ public class Observation<T>: Observable {
         }
     }
     
-    var onChange:(T? -> Void)?
-    var getValue:(Void -> T?)?
+    var onChange:((T?) -> Void)?
+    var getValue:((Void) -> T?)?
     
-    public func valueChanged(newValue:T?) {
+    open func valueChanged(_ newValue:T?) {
         self.value = newValue
     }
 }
@@ -45,8 +45,8 @@ public class Observation<T>: Observable {
 /**
  A mapping of owner objects to Observations.  Owner references are weak.  Observation references are strong.
  */
-public class ObservationRegistry<V> {
-    var observations:NSMapTable = NSMapTable.weakToStrongObjectsMapTable()
+open class ObservationRegistry<V> {
+    var observations:NSMapTable = NSMapTable.weakToStrongObjects()
     
     public init() { }
 
@@ -54,7 +54,7 @@ public class ObservationRegistry<V> {
         self.observations.removeAllObjects()
     }
     
-    func each(closure:(Observation<V> -> Void)) {
+    func each(_ closure:((Observation<V>) -> Void)) {
         let enumerator = self.observations.objectEnumerator()
         
         while let observation = enumerator?.nextObject() {
@@ -64,20 +64,20 @@ public class ObservationRegistry<V> {
         }
     }
     
-    func get<U:Observer where U.ValueType==V>(observer:U?) -> Observation<V>? {
-        return self.observations.objectForKey(observer) as? Observation<V>
+    func get<U:Observer>(_ observer:U?) -> Observation<V>? where U.ValueType==V {
+        return self.observations.object(forKey: observer) as? Observation<V>
     }
 
-    func setNil(observation:Observation<V>?) {
+    func setNil(_ observation:Observation<V>?) {
         self.observations.setObject(observation, forKey: DefaultObserverKey)
     }
 
-    func set(owner:AnyObject, _ observation:Observation<V>?) {
+    func set(_ owner:AnyObject, _ observation:Observation<V>?) {
         self.observations.setObject(observation, forKey: owner)
     }
     
-    func remove<U:Observer where U.ValueType==V>(observer:U) {
-        self.observations.removeObjectForKey(observer)
+    func remove<U:Observer>(_ observer:U) where U.ValueType==V {
+        self.observations.removeObject(forKey: observer)
     }
 
 }

@@ -15,9 +15,9 @@ public protocol ValueTransformerType {
  A strongly typed transformer between AnyObject and a particular type.
  The default implementation does nothing (i.e., everything is mapped to nil).
  */
-public class ValueTransformer<T>: ValueTransformerType {
-    public typealias ImportActionType = (AnyObject? -> T?)
-    public typealias ExportActionType = (T? -> AnyObject?)
+open class ValueTransformer<T>: ValueTransformerType {
+    public typealias ImportActionType = ((AnyObject?) -> T?)
+    public typealias ExportActionType = ((T?) -> AnyObject?)
     
     var importAction: ImportActionType?
     var exportAction: ExportActionType?
@@ -26,7 +26,7 @@ public class ValueTransformer<T>: ValueTransformerType {
         
     }
     
-    public init(importAction:ImportActionType, exportAction:ExportActionType) {
+    public init(importAction:@escaping ImportActionType, exportAction:@escaping ExportActionType) {
         self.importAction = importAction
         self.exportAction = exportAction
     }
@@ -34,7 +34,7 @@ public class ValueTransformer<T>: ValueTransformerType {
     /**
      Attempts to convert an external value to an internal form.  If that's not possible, or if the external value is nil, returns nil.
      */
-    public func importValue(value:AnyObject?) -> T? {
+    open func importValue(_ value:AnyObject?) -> T? {
         return self.importAction?(value)
     }
 
@@ -42,11 +42,11 @@ public class ValueTransformer<T>: ValueTransformerType {
      Transforms a value into an external form suitable for serialization.
      - parameter explicitNull: If false, export nil values as nil. If true, export nil values as a special null value (defaulting to NSNull)
      */
-    public func exportValue(value:T?, explicitNull: Bool = false) -> AnyObject? {
+    open func exportValue(_ value:T?, explicitNull: Bool = false) -> AnyObject? {
         if let value = self.exportAction?(value) {
             return value
         } else {
-            return self.dynamicType.nullValue(explicit: explicitNull)
+            return type(of: self).nullValue(explicit: explicitNull)
         }
     }
     
@@ -54,14 +54,14 @@ public class ValueTransformer<T>: ValueTransformerType {
      Generates an external value representing nil.
      - parameter explicit: Whether the value should be a special (non-nil) value.
      */
-    public class func nullValue(explicit explicit: Bool = false) -> AnyObject? {
+    open class func nullValue(explicit: Bool = false) -> AnyObject? {
         return explicit ? NSNull() : nil
     }
     
     /**
      Determine whether an external value represents nil.  By default, this will be true for `nil` and `NSNull` instances.
      */
-    public class func valueIsNull(value: AnyObject?) -> Bool {
+    open class func valueIsNull(_ value: AnyObject?) -> Bool {
         return value == nil || value is NSNull
     }
 }
@@ -69,7 +69,7 @@ public class ValueTransformer<T>: ValueTransformerType {
 /**
  The simplest working implementation of a transformer: just attempts to cast between T and AnyObject
  */
-public class SimpleValueTransformer<T>: ValueTransformer<T> {
+open class SimpleValueTransformer<T>: ValueTransformer<T> {
     
     public required init() {
         super.init(importAction: { $0 as? T }, exportAction: { $0 as? AnyObject } )

@@ -27,7 +27,7 @@ public extension Observable {
      
      - parameter observer: an Observer object that will receive change notifications
      */
-    public func addObserver<U:Observer where U.ValueType==ValueType>(observer:U) -> Observation<ValueType> {
+    public func addObserver<U:Observer>(_ observer:U) -> Observation<ValueType> where U.ValueType==ValueType {
         let observation = Observation<ValueType>()
         observation.onChange = { (value:ValueType?) -> Void in
             observer.valueChanged(value, observable:self)
@@ -45,7 +45,7 @@ public extension Observable {
      
      - parameter onChange: A closure to be run when the value changes
      */
-    public func addObserver(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+    public func addObserver(onChange:@escaping ((ValueType?) -> Void)) -> Observation<ValueType> {
         let observation = self.createClosureObservation(onChange: onChange)
         self.observations.setNil(observation)
         return observation
@@ -57,13 +57,13 @@ public extension Observable {
      - parameter owner: The observation owner, used only as a key for registering the action
      - parameter onChange: A closure to be run when the value changes
      */
-    public func addObserver<U:Observer where U.ValueType==ValueType>(owner owner:U, onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+    public func addObserver<U:Observer>(owner:U, onChange:@escaping ((ValueType?) -> Void)) -> Observation<ValueType> where U.ValueType==ValueType {
         let observation = self.createClosureObservation(onChange: onChange)
         self.observations.set(owner, observation)
         return observation
     }
     
-    private func createClosureObservation(onChange onChange:(ValueType? -> Void)) -> Observation<ValueType> {
+    fileprivate func createClosureObservation(onChange:@escaping ((ValueType?) -> Void)) -> Observation<ValueType> {
         let observation = Observation<ValueType>()
         observation.onChange = onChange
         observation.valueChanged(self.value)
@@ -89,7 +89,7 @@ public extension Observable {
     /**
      Unregisters an observer
      */
-    public func removeObserver<U:Observer where U.ValueType==ValueType>(observer:U) {
+    public func removeObserver<U:Observer>(_ observer:U) where U.ValueType==ValueType {
         self.observations.remove(observer)
     }
 }
@@ -99,23 +99,23 @@ infix operator --> { associativity left precedence 95 }
 infix operator -/-> { associativity left precedence 95 }
 infix operator <--> { associativity left precedence 95 }
 
-public func <--<T:Observable, U:Observer where U.ValueType == T.ValueType>(observer:U, observedField:T) {
+public func <--<T:Observable, U:Observer>(observer:U, observedField:T) where U.ValueType == T.ValueType {
     observedField.addObserver(observer)
 }
 
-public func --><T:Observable, U:Observer where U.ValueType == T.ValueType>(observable:T, observer:U) -> Observation<T.ValueType> {
+public func --><T:Observable, U:Observer>(observable:T, observer:U) -> Observation<T.ValueType> where U.ValueType == T.ValueType {
     return observable.addObserver(observer)
 }
 
-public func --><T:Observable>(observable:T, onChange:(T.ValueType? -> Void)) -> Observation<T.ValueType> {
+public func --><T:Observable>(observable:T, onChange:@escaping ((T.ValueType?) -> Void)) -> Observation<T.ValueType> {
     return observable.addObserver(onChange: onChange)
 }
 
-public func -/-><T:Observable, U:Observer where U.ValueType == T.ValueType>(observable:T, observer:U) {
+public func -/-><T:Observable, U:Observer>(observable:T, observer:U) where U.ValueType == T.ValueType {
     observable.removeObserver(observer)
 }
 
-public func <--><T, U where T:Observer, T:Observable, U:Observer, U:Observable, T.ValueType == U.ValueType>(left: T, right: U) {
+public func <--><T, U>(left: T, right: U) where T:Observer, T:Observable, U:Observer, U:Observable, T.ValueType == U.ValueType {
     // Order is important!
     right.addObserver(left)
     left.addObserver(right)

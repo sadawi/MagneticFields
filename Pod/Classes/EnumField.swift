@@ -13,13 +13,13 @@ import Foundation
 /**
  A value transformer that attempts to convert between raw values and enums.
  */
-public class EnumValueTransformer<E:RawRepresentable>: ValueTransformer<E> {
+open class EnumValueTransformer<E:RawRepresentable>: ValueTransformer<E> {
     
     public required init() {
         super.init()
     }
     
-    public override func importValue(value:AnyObject?) -> E? {
+    open override func importValue(_ value:AnyObject?) -> E? {
         if let raw = value as? E.RawValue {
             return E(rawValue: raw)
         } else {
@@ -27,20 +27,20 @@ public class EnumValueTransformer<E:RawRepresentable>: ValueTransformer<E> {
         }
     }
     
-    public override func exportValue(value:E?, explicitNull: Bool = false) -> AnyObject? {
-        return (value?.rawValue as? AnyObject) ?? self.dynamicType.nullValue(explicit: explicitNull)
+    open override func exportValue(_ value:E?, explicitNull: Bool = false) -> AnyObject? {
+        return (value?.rawValue as? AnyObject) ?? type(of: self).nullValue(explicit: explicitNull)
     }
 }
 
 /**
  A field whose value is a RawRepresentable
  */
-public class EnumField<T where T:RawRepresentable, T:Equatable>: Field<T> {
+open class EnumField<T>: Field<T> where T:RawRepresentable, T:Equatable {
     public override init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
         super.init(value: value, name: name, priority: priority, key: key)
     }
     
-    public override func defaultValueTransformer() -> ValueTransformer<T> {
+    open override func defaultValueTransformer() -> ValueTransformer<T> {
         return EnumValueTransformer<T>()
     }
 }

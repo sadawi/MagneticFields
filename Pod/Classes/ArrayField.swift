@@ -8,7 +8,7 @@
 
 import Foundation
 
-prefix operator * { }
+prefix operator *
 
 /**
  Convenience prefix operator for declaring an ArrayField: just put a * in front of the declaration for the equivalent single-valued field.
@@ -37,13 +37,13 @@ public prefix func *<T>(right:Field<T>) -> ArrayField<T> {
  let tags = *Field<String>(name: "Tags")
  
  */
-public class ArrayField<T:Equatable>: BaseField<[T]> {
+open class ArrayField<T:Equatable>: BaseField<[T]> {
     /**
      A field describing how individual values will be transformed and validated.
      */
-    public var field:Field<T>
+    open var field:Field<T>
     
-    public override var value:[T]? {
+    open override var value:[T]? {
         didSet {
             self.valueUpdated(oldValue: oldValue, newValue: self.value)
         }
@@ -55,20 +55,20 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
         self.value = value
     }
     
-    public func append(value:T) {
+    open func append(_ value:T) {
         self.value?.append(value)
         self.valueAdded(value)
     }
     
-    public func removeFirst(value:T) {
-        if let index = self.value?.indexOf(value) {
+    open func removeFirst(_ value:T) {
+        if let index = self.value?.index(of: value) {
             self.removeAtIndex(index)
         }
     }
 
-    public func removeAtIndex(index:Int) {
+    open func removeAtIndex(_ index:Int) {
         let value = self.value?[index]
-        self.value?.removeAtIndex(index)
+        self.value?.remove(at: index)
         if let value = value {
             self.valueRemoved(value)
         }
@@ -76,22 +76,22 @@ public class ArrayField<T:Equatable>: BaseField<[T]> {
     
     // MARK: - Dictionary values
     
-    public override func readFromDictionary(dictionary:[String:AnyObject]) {
+    open override func readFromDictionary(_ dictionary:[String:AnyObject]) {
         if let key = self.key, let dictionaryValues = dictionary[key] as? [AnyObject] {
             self.value = dictionaryValues.map { self.field.valueTransformer().importValue($0) }.flatMap{$0}
         }
     }
     
-    public override func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String, explicitNull: Bool = false) {
+    open override func writeUnseenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
         if let key = self.key, let value = self.value {
             dictionary[key] = value.map { self.field.valueTransformer().exportValue($0) }.flatMap { $0 }
         }
     }
 
     
-    public func valueRemoved(value: T) {
+    open func valueRemoved(_ value: T) {
     }
     
-    public func valueAdded(value: T) {
+    open func valueAdded(_ value: T) {
     }
 }

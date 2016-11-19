@@ -19,12 +19,12 @@ public protocol ValueTransformable {
  but then the extension's overriding method won't be called by other methods in the base class.
  */
 
-public class AutomaticField<T where T:ValueTransformable, T:Equatable>: Field<T> {
+open class AutomaticField<T>: Field<T> where T:ValueTransformable, T:Equatable {
     public override init(value:T?=nil, name:String?=nil, priority:Int=0, key:String?=nil) {
         super.init(value: value, name: name, priority: priority, key: key)
     }
 
-    public override func defaultValueTransformer() -> ValueTransformer<T> {
+    open override func defaultValueTransformer() -> ValueTransformer<T> {
         return T.valueTransformer
     }
 

@@ -8,20 +8,20 @@
 
 import Foundation
 
-public class ValidationRule<ValueType> {
-    var test:(ValueType -> Bool)?
+open class ValidationRule<ValueType> {
+    var test:((ValueType) -> Bool)?
     var message:String?
     var allowNil:Bool = true
     
     public init() { }
     
-    public init(test:(ValueType -> Bool), message:String?=nil, allowNil:Bool = true) {
+    public init(test:@escaping ((ValueType) -> Bool), message:String?=nil, allowNil:Bool = true) {
         self.message = message ?? "is invalid"
         self.test = test
         self.allowNil = allowNil
     }
     
-    public func validate(value:ValueType?) -> Bool {
+    open func validate(_ value:ValueType?) -> Bool {
         if let unwrappedValue = value {
             return self.validate(unwrappedValue)
         } else {
@@ -29,7 +29,7 @@ public class ValidationRule<ValueType> {
         }
     }
     
-    func validate(value:ValueType) -> Bool {
+    func validate(_ value:ValueType) -> Bool {
         if let test = self.test {
             return test(value)
         } else {
@@ -38,7 +38,7 @@ public class ValidationRule<ValueType> {
     }
 }
 
-public class RangeRule<T:Comparable>: ValidationRule<T> {
+open class RangeRule<T:Comparable>: ValidationRule<T> {
     var minimum:T?
     var maximum:T?
 
@@ -48,7 +48,7 @@ public class RangeRule<T:Comparable>: ValidationRule<T> {
         self.maximum = maximum
     }
 
-    override func validate(value: T) -> Bool {
+    override func validate(_ value: T) -> Bool {
         if let minimum = self.minimum {
             if value < minimum {
                 self.message = "must be greater than \(minimum)"
@@ -65,15 +65,15 @@ public class RangeRule<T:Comparable>: ValidationRule<T> {
     }
 }
 
-public class TransformerRule<FromType, ToType>: ValidationRule<FromType> {
+open class TransformerRule<FromType, ToType>: ValidationRule<FromType> {
     var rule:ValidationRule<ToType>?
-    var transform:(FromType -> ToType?)?
+    var transform:((FromType) -> ToType?)?
     
     override init() {
         super.init()
     }
 
-    override func validate(value: FromType) -> Bool {
+    override func validate(_ value: FromType) -> Bool {
         let transformed = self.transform?(value)
         if let rule = self.rule {
             return rule.validate(transformed)
@@ -84,7 +84,7 @@ public class TransformerRule<FromType, ToType>: ValidationRule<FromType> {
     }
 }
 
-public class LengthRule: TransformerRule<String, Int> {
+open class LengthRule: TransformerRule<String, Int> {
     public init(minimum:Int?=nil, maximum:Int?=nil) {
         super.init()
         self.transform = { $0.characters.count }
@@ -92,13 +92,13 @@ public class LengthRule: TransformerRule<String, Int> {
     }
 }
 
-public class NotBlankRule: ValidationRule<String> {
+open class NotBlankRule: ValidationRule<String> {
     override public init() {
         super.init()
         self.message = "cannot be blank"
     }
     
-    override public func validate(value: String?) -> Bool {
+    override open func validate(_ value: String?) -> Bool {
         if let v = value {
             return v.characters.count > 0
         } else {

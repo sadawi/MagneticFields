@@ -10,33 +10,33 @@ import Foundation
 
 
 public enum LoadState {
-    case NotLoaded
-    case Loaded
-    case Loading
-    case Error
+    case notLoaded
+    case loaded
+    case loading
+    case error
 }
 
 public enum ValidationState:Equatable {
-    case Unknown
-    case Invalid([String])
-    case Valid
+    case unknown
+    case invalid([String])
+    case valid
     
     public var isInvalid: Bool {
         switch self {
-        case .Invalid: return true
+        case .invalid: return true
         default: return false
         }
     }
     
     public var isValid: Bool {
-        return self == .Valid
+        return self == .valid
     }
 }
 public func ==(lhs:ValidationState, rhs:ValidationState) -> Bool {
     switch (lhs, rhs) {
-    case (.Unknown, .Unknown): return true
-    case (.Valid, .Valid): return true
-    case (let .Invalid(leftMessages), let .Invalid(rightMessages)): return leftMessages == rightMessages
+    case (.unknown, .unknown): return true
+    case (.valid, .valid): return true
+    case (let .invalid(leftMessages), let .invalid(rightMessages)): return leftMessages == rightMessages
     default: return false
     }
 }
@@ -51,17 +51,17 @@ public protocol FieldType:AnyObject {
     var validationState:ValidationState { get }
     var loadState:LoadState { get }
     
-    func addValidationError(message:String)
+    func addValidationError(_ message:String)
     func resetValidationState()
     func validate() -> ValidationState
 
-    func readFromDictionary(dictionary:[String:AnyObject])
-    func writeToDictionary(inout dictionary:[String:AnyObject], inout seenFields:[FieldType], explicitNull: Bool)
+    func readFromDictionary(_ dictionary:[String:AnyObject])
+    func writeToDictionary(_ dictionary:inout [String:AnyObject], seenFields:inout [FieldType], explicitNull: Bool)
 }
 
 public extension FieldType {
     /// A version of writeToDictionary with optional params, since that's not possible with just the protocol.
-    public func writeToDictionary(inout dictionary:[String:AnyObject], explicitNull: Bool = false) {
+    public func writeToDictionary(_ dictionary:inout [String:AnyObject], explicitNull: Bool = false) {
         var seenFields:[FieldType] = []
         self.writeToDictionary(&dictionary, seenFields: &seenFields, explicitNull: explicitNull)
     }
@@ -71,43 +71,43 @@ public extension FieldType {
 let DefaultObserverKey:NSString = "____"
 let DefaultValueTransformerKey = "default"
 
-public class BaseField<T>: FieldType, Observer, Observable {
+open class BaseField<T>: FieldType, Observer, Observable {
     public typealias ValueType = T
     
-    public var valueType:Any.Type {
+    open var valueType:Any.Type {
         return T.self
     }
     
     /**
      Information about whether this field's value has been set
      */
-    public var loadState:LoadState = .NotLoaded
+    open var loadState:LoadState = .notLoaded
     
     /**
      A human-readable name for this field.
      */
-    public var name:String?
+    open var name:String?
     
     /**
      Desired position in forms
      */
-    public var priority:Int = 0
+    open var priority:Int = 0
     
     /**
      An internal identifier (e.g., for identifying form fields)
      */
-    public var key:String?
+    open var key:String?
     
     /**
      The value contained in this field.  Note: it's always Optional.
      */
-    public var value:T? {
+    open var value:T? {
         didSet {
             self.valueUpdated(oldValue: oldValue, newValue: self.value)
         }
     }
     
-    public var anyObjectValue:AnyObject? {
+    open var anyObjectValue:AnyObject? {
         get {
             return self.value as? AnyObject
         }
@@ -123,7 +123,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
         }
     }
     
-    public var anyValue:Any? {
+    open var anyValue:Any? {
         get {
             // It's important to cast to `Any?` rather than `Any`.
             // Casting to `Any` seems to hide the optional in a way that's hard to unwrap.
@@ -131,26 +131,26 @@ public class BaseField<T>: FieldType, Observer, Observable {
         }
     }
     
-    public func valueUpdated(oldValue oldValue:T?, newValue: T?) {
-        self.loadState = .Loaded
-        self.validationState = .Unknown
-        self.updatedAt = NSDate()
+    open func valueUpdated(oldValue:T?, newValue: T?) {
+        self.loadState = .loaded
+        self.validationState = .unknown
+        self.updatedAt = Date()
         self.valueUpdatedHandler?(newValue)
     }
     
     
     // MARK: -
     
-    internal var valueUpdatedHandler:(T? -> Void)?
+    internal var valueUpdatedHandler:((T?) -> Void)?
     
-    public func valueUpdated(handler: (T? -> Void)) -> Self {
+    open func valueUpdated(_ handler: @escaping ((T?) -> Void)) -> Self {
         self.valueUpdatedHandler = handler
         return self
     }
     
     
-    public var changedAt:NSDate?
-    public var updatedAt:NSDate?
+    open var changedAt:Date?
+    open var updatedAt:Date?
     
     
     /**
@@ -161,7 +161,7 @@ public class BaseField<T>: FieldType, Observer, Observable {
             self.value = value
             
             // didSet isn't triggered from init
-            self.loadState = .Loaded
+            self.loadState = .loaded
         }
         self.name = name
         self.priority = priority
@@ -172,14 +172,14 @@ public class BaseField<T>: FieldType, Observer, Observable {
     
     internal var validationRules:[ValidationRule<T>] = []
     
-    public  var validationState:ValidationState = .Unknown
+    open  var validationState:ValidationState = .unknown
     
     /**
      Test whether the current field value passes all the validation rules.
      
      - returns: A ValidationState that includes error messages, if applicable.
      */
-    public func validate() -> ValidationState {
+    open func validate() -> ValidationState {
         var valid = true
         var messages:[String] = []
         for validator in self.validationRules {
@@ -190,28 +190,28 @@ public class BaseField<T>: FieldType, Observer, Observable {
                 }
             }
         }
-        self.validationState = valid ? .Valid : .Invalid(messages)
+        self.validationState = valid ? .valid : .invalid(messages)
         return self.validationState
     }
     
-    public func validateIfNeeded() -> ValidationState {
-        if self.validationState == .Unknown {
+    open func validateIfNeeded() -> ValidationState {
+        if self.validationState == .unknown {
             self.validate()
         }
         return self.validationState
     }
     
-    public func resetValidationState() {
-        self.validationState = .Unknown
+    open func resetValidationState() {
+        self.validationState = .unknown
     }
     
-    public func addValidationError(message:String) {
+    open func addValidationError(_ message:String) {
         switch self.validationState {
-        case .Invalid(var messages):
+        case .invalid(var messages):
             messages.append(message)
-            self.validationState = .Invalid(messages)
+            self.validationState = .invalid(messages)
         default:
-            self.validationState = .Invalid([message])
+            self.validationState = .invalid([message])
         }
     }
     
@@ -222,42 +222,42 @@ public class BaseField<T>: FieldType, Observer, Observable {
      - parameter allowNil: Whether nil values should be considered valid
      - parameter rule: A closure containing validation logic for an unwrapped field value
      */
-    public func require(message message:String?=nil, allowNil:Bool=true, test:(T -> Bool)) -> Self {
+    open func require(message:String?=nil, allowNil:Bool=true, test:((T) -> Bool)) -> Self {
         let rule = ValidationRule<T>(test: test, message:message, allowNil: allowNil)
         return self.require(rule)
     }
     
-    public func requireNotNil() -> Self {
+    open func requireNotNil() -> Self {
         return self.require(message: "is required", allowNil:false) { T -> Bool in return true }
     }
     
-    public func require(rule: ValidationRule<T>) -> Self {
+    open func require(_ rule: ValidationRule<T>) -> Self {
         self.validationRules.append(rule)
         return self
     }
     
     internal func valueChanged() {
-        self.changedAt = NSDate()
+        self.changedAt = Date()
         self.notifyObservers()
     }
     
     // MARK: - Observation
     
-    public var observations = ObservationRegistry<T>()
+    open var observations = ObservationRegistry<T>()
     
     /**
      If a field is registered as an observer, it will set its own value to the observed new value.
      */
-    public func valueChanged<ObservableType:Observable>(value:T?, observable:ObservableType?) {
+    open func valueChanged<ObservableType:Observable>(_ value:T?, observable:ObservableType?) {
         self.value = value
     }
     
     // MARK: - Dictionary values
     
-    public func readFromDictionary(dictionary:[String:AnyObject]) { }
-    public func writeToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], explicitNull: Bool = false) {
+    open func readFromDictionary(_ dictionary:[String:AnyObject]) { }
+    open func writeToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], explicitNull: Bool = false) {
         if let key = self.key {
-            if seenFields.contains({$0 === self}) {
+            if seenFields.contains(where: {$0 === self}) {
                 self.writeSeenValueToDictionary(&dictionary, seenFields: &seenFields, key: key)
             } else {
                 seenFields.append(self)
@@ -266,11 +266,11 @@ public class BaseField<T>: FieldType, Observer, Observable {
         }
     }
     
-    public func writeUnseenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String, explicitNull: Bool = false) {
+    open func writeUnseenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String, explicitNull: Bool = false) {
         // Implement in subclass
     }
     
-    public func writeSeenValueToDictionary(inout dictionary: [String : AnyObject], inout seenFields: [FieldType], key: String) {
+    open func writeSeenValueToDictionary(_ dictionary: inout [String : AnyObject], seenFields: inout [FieldType], key: String) {
         // Implement in subclass
     }
     
