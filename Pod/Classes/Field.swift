@@ -33,7 +33,7 @@ open class Field<T:Equatable>: BaseField<T>, Equatable {
      - parameter importValue: A closure mapping an external value (e.g., a string) to a value for this field.
      - parameter exportValue: A closure mapping a field value to an external value
      */
-    open func transform(importValue:((AnyObject?) -> T?), exportValue:((T?) -> AnyObject?), name transformerName: String?=nil) -> Self {
+    open func transform(importValue:@escaping ((AnyObject?) -> T?), exportValue:@escaping ((T?) -> AnyObject?), name transformerName: String?=nil) -> Self {
         
         self.valueTransformers[transformerName ?? DefaultValueTransformerKey] = ValueTransformer(importAction: importValue, exportAction: exportValue)
         return self

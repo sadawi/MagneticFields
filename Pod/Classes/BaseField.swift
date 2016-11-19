@@ -222,7 +222,7 @@ open class BaseField<T>: FieldType, Observer, Observable {
      - parameter allowNil: Whether nil values should be considered valid
      - parameter rule: A closure containing validation logic for an unwrapped field value
      */
-    open func require(message:String?=nil, allowNil:Bool=true, test:((T) -> Bool)) -> Self {
+    open func require(message:String?=nil, allowNil:Bool=true, test:@escaping ((T) -> Bool)) -> Self {
         let rule = ValidationRule<T>(test: test, message:message, allowNil: allowNil)
         return self.require(rule)
     }
